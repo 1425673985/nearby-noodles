@@ -1,0 +1,75 @@
+<!--index.wxml-->
+<view class="container">
+  <!-- 加载提示 -->
+  <view class="loading" wx:if="{{loading}}">
+    <text>正在加载附近面馆...</text>
+  </view>
+
+  <!-- 授权提示 -->
+  <view class="auth-tip" wx:if="{{!hasLocationAuth}}">
+    <text>需要授权位置信息才能查找附近面馆</text>
+    <button bindtap="requestLocationAuth" type="primary">授权位置信息</button>
+  </view>
+
+  <!-- 面馆信息卡片 -->
+  <view class="restaurant-card" wx:if="{{restaurant && hasLocationAuth && !loading}}">
+    <!-- 面馆地图 -->
+    <view class="restaurant-map-wrapper">
+      <map 
+        id="restaurantMap"
+        class="restaurant-map" 
+        longitude="{{mapLongitude}}" 
+        latitude="{{mapLatitude}}"
+        scale="{{mapScale}}"
+        markers="{{restaurant.mapMarkers}}"
+        show-location="true"
+        enable-zoom="true"
+        enable-scroll="true"
+        enable-rotate="false"
+        bindtap="onMapTap"
+      ></map>
+      <!-- 地图控制按钮 -->
+      <view class="map-control-buttons">
+        <view class="map-control-btn location-restaurant-btn" bindtap="moveToRestaurant">
+          <view class="location-pin-icon icon-red"></view>
+        </view>
+        <view class="map-control-btn location-user-btn" bindtap="moveToUserLocation">
+          <view class="location-pin-icon icon-blue"></view>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 面馆信息 -->
+    <view class="restaurant-info">
+      <!-- 店名 -->
+      <view class="restaurant-name">{{restaurant.name}}</view>
+      
+      <!-- 推荐标签 -->
+      <view class="restaurant-tag">
+        <view class="tag-badge">
+          <text class="tag-text">{{restaurant.tag}}</text>
+        </view>
+      </view>
+
+      <!-- 距离（突出显示） -->
+      <view class="restaurant-distance">
+        距离您 {{restaurant.distance}}m
+      </view>
+
+      <!-- 地址（弱化） -->
+      <view class="restaurant-address">{{restaurant.address}}</view>
+    </view>
+
+        <!-- 操作按钮 -->
+        <view class="action-buttons">
+          <button class="action-btn change-btn" bindtap="changeRestaurant" disabled="{{searchedRestaurants.length <= 1}}">换一家</button>
+          <button class="action-btn nav-btn" bindtap="openNavigation">去这家</button>
+        </view>
+  </view>
+
+  <!-- 错误提示 -->
+  <view class="error-tip" wx:if="{{error}}">
+    <text>{{error}}</text>
+    <button bindtap="retryLoad" type="primary">重试</button>
+  </view>
+</view>

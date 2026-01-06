@@ -1,0 +1,22 @@
+# 微信小程序
+project.private.config.json
+
+# 日志文件
+*.log
+
+# 依赖
+node_modules/
+
+# 编辑器
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# 系统文件
+.DS_Store
+Thumbs.db
+
+# 配置文件（包含敏感信息）
+# utils/config.js  # 如果不想提交配置文件，可以取消注释

@@ -1,0 +1,15 @@
+<!--pages/profile/profile.wxml-->
+<view class="container">
+  <view class="profile-content">
+    <!-- 个人信息内容区域 -->
+    <view class="info-section">
+      <text class="info-text">个人信息页面</text>
+    </view>
+  </view>
+
+  <!-- 版本号显示 -->
+  <view class="version-container">
+    <text class="version-text">{{versionDisplay}}</text>
+  </view>
+</view>
+
