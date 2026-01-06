@@ -18,11 +18,24 @@ Page({
     currentIndex: 0, // 当前显示的面馆索引
     mapLongitude: 0, // 地图中心经度
     mapLatitude: 0, // 地图中心纬度
-    mapScale: 16 // 地图缩放级别
+    mapScale: 16, // 地图缩放级别
+    showLocationBtn: false, // 是否显示定位用户按钮
+    mapContext: null, // 地图上下文
+    mapInteractionTimer: null // 地图交互定时器
   },
 
   onLoad() {
     this.checkLocationAuth()
+    // 初始化地图上下文
+    this.mapContext = null
+  },
+
+  onUnload() {
+    // 清理定时器
+    if (this.mapInteractionTimer) {
+      clearTimeout(this.mapInteractionTimer)
+      this.mapInteractionTimer = null
+    }
   },
 
   onShow() {
@@ -154,17 +167,21 @@ Page({
           
           // 根据距离选择推荐标签
           firstRestaurant.tag = this.getRecommendTag(firstRestaurant.distance)
+          // 生成随机推荐标签
+          firstRestaurant.randomTag = this.getRandomRecommendTag()
           
           this.setData({
             searchedRestaurants: displayRestaurants,
             currentIndex: 0,
             restaurant: firstRestaurant,
-            mapLongitude: firstRestaurant.location.lng,
-            mapLatitude: firstRestaurant.location.lat,
-            mapScale: 16,
             loading: false,
             error: null
           })
+          
+          // 自动聚焦用户位置和面馆位置（适合步行）
+          setTimeout(() => {
+            this.focusOnUserAndRestaurant()
+          }, 300)
         } else {
           this.setData({
             loading: false,
@@ -249,6 +266,8 @@ Page({
 
     // 根据距离选择推荐标签
     const tag = this.getRecommendTag(Math.round(distance))
+    // 生成随机推荐标签
+    const randomTag = this.getRandomRecommendTag()
 
     return {
       id: restaurant.id || restaurant._id || '',
@@ -258,7 +277,8 @@ Page({
       distance: Math.round(distance),
       mapMarkers: mapMarkers,
       tel: restaurant.tel || restaurant.phone || '',
-      tag: tag
+      tag: tag,
+      randomTag: randomTag
     }
   },
 
@@ -267,59 +287,158 @@ Page({
     console.log('地图被点击', e)
   },
 
-  // 定位到面馆位置
-  moveToRestaurant() {
-    const { restaurant } = this.data
-    if (restaurant && restaurant.location) {
+  // 地图拖动开始
+  onMapRegionChange(e) {
+    // 用户主动操作地图时，显示定位按钮
+    if (e.type === 'begin') {
+      this.showLocationButton()
+    }
+  },
+
+  // 地图缩放
+  onMapScaleChange(e) {
+    // 用户缩放地图时，显示定位按钮
+    this.showLocationButton()
+  },
+
+  // 显示定位用户按钮
+  showLocationButton() {
+    this.setData({
+      showLocationBtn: true
+    })
+    
+    // 清除之前的定时器
+    if (this.mapInteractionTimer) {
+      clearTimeout(this.mapInteractionTimer)
+    }
+    
+    // 3秒后自动隐藏
+    this.mapInteractionTimer = setTimeout(() => {
       this.setData({
-        mapLongitude: restaurant.location.lng,
-        mapLatitude: restaurant.location.lat,
-        mapScale: 18 // 放大到更详细的级别
+        showLocationBtn: false
       })
-      
-      // 使用地图组件的moveToLocation方法
-      const mapCtx = wx.createMapContext('restaurantMap', this)
-      mapCtx.moveToLocation({
-        longitude: restaurant.location.lng,
-        latitude: restaurant.location.lat
-      })
-      
-      wx.showToast({
-        title: '已定位到面馆',
-        icon: 'success',
-        duration: 1000
+      this.mapInteractionTimer = null
+    }, 3000)
+  },
+
+  // 计算两点边界，确定合适的中心点和缩放级别（适合步行）
+  calculateBoundsForWalking(userLng, userLat, restaurantLng, restaurantLat) {
+    const minLng = Math.min(userLng, restaurantLng)
+    const maxLng = Math.max(userLng, restaurantLng)
+    const minLat = Math.min(userLat, restaurantLat)
+    const maxLat = Math.max(userLat, restaurantLat)
+
+    // 计算中心点
+    const centerLng = (minLng + maxLng) / 2
+    const centerLat = (minLat + maxLat) / 2
+
+    // 计算距离范围（米）
+    const lngRange = this.calculateDistance(centerLat, minLng, centerLat, maxLng)
+    const latRange = this.calculateDistance(minLat, centerLng, maxLat, centerLng)
+    const maxRange = Math.max(lngRange, latRange)
+
+    // 根据距离范围计算合适的缩放级别（适合步行，显示路口和行走方向）
+    let scale = 17 // 默认较近距离
+    if (maxRange > 1000) {
+      scale = 15 // 1公里以上
+    } else if (maxRange > 500) {
+      scale = 16 // 500米-1公里
+    } else if (maxRange > 200) {
+      scale = 17 // 200-500米
+    } else {
+      scale = 18 // 200米以内，更详细
+    }
+
+    // 添加边距，确保两个点都能完整显示，同时能看到路口
+    const padding = maxRange * 0.4 // 40%的边距
+    const adjustedRange = maxRange + padding
+
+    // 根据调整后的范围重新计算缩放级别
+    if (adjustedRange > 1000) {
+      scale = 15
+    } else if (adjustedRange > 500) {
+      scale = 16
+    } else if (adjustedRange > 200) {
+      scale = 17
+    } else {
+      scale = 18
+    }
+
+    return {
+      centerLng,
+      centerLat,
+      scale
+    }
+  },
+
+  // 自动聚焦用户位置和面馆位置（适合步行）
+  focusOnUserAndRestaurant() {
+    const { userLocation, restaurant } = this.data
+    
+    if (!userLocation || !restaurant || !restaurant.location) {
+      return
+    }
+
+    // 计算边界
+    const bounds = this.calculateBoundsForWalking(
+      userLocation.longitude,
+      userLocation.latitude,
+      restaurant.location.lng,
+      restaurant.location.lat
+    )
+
+    // 更新地图中心和缩放级别
+    this.setData({
+      mapLongitude: bounds.centerLng,
+      mapLatitude: bounds.centerLat,
+      mapScale: bounds.scale,
+      showLocationBtn: false // 自动聚焦时隐藏按钮
+    })
+
+    // 使用地图上下文确保视图更新
+    if (!this.mapContext) {
+      this.mapContext = wx.createMapContext('restaurantMap', this)
+    }
+    
+    if (this.mapContext) {
+      // 使用includePoints确保两个点都在视野内
+      this.mapContext.includePoints({
+        points: [
+          {
+            longitude: userLocation.longitude,
+            latitude: userLocation.latitude
+          },
+          {
+            longitude: restaurant.location.lng,
+            latitude: restaurant.location.lat
+          }
+        ],
+        padding: [60, 60, 60, 60], // 上下左右边距
+        success: () => {
+          console.log('地图自动聚焦成功')
+        },
+        fail: (err) => {
+          console.warn('地图自动聚焦失败，使用setData方式', err)
+        }
       })
     }
   },
 
-  // 定位到用户位置
+
+  // 定位到用户位置（恢复推荐视图）
   moveToUserLocation() {
-    const { userLocation } = this.data
-    if (userLocation) {
-      this.setData({
-        mapLongitude: userLocation.longitude,
-        mapLatitude: userLocation.latitude,
-        mapScale: 16
-      })
-      
-      // 使用地图组件的moveToLocation方法
-      const mapCtx = wx.createMapContext('restaurantMap', this)
-      mapCtx.moveToLocation({
-        longitude: userLocation.longitude,
-        latitude: userLocation.latitude
-      })
-      
-      wx.showToast({
-        title: '已定位到我的位置',
-        icon: 'success',
-        duration: 1000
-      })
-    } else {
-      wx.showToast({
-        title: '未获取到位置信息',
-        icon: 'none',
-        duration: 2000
-      })
+    // 恢复自动聚焦视图（用户位置+面馆位置）
+    this.focusOnUserAndRestaurant()
+    
+    // 隐藏按钮
+    this.setData({
+      showLocationBtn: false
+    })
+    
+    // 清除定时器
+    if (this.mapInteractionTimer) {
+      clearTimeout(this.mapInteractionTimer)
+      this.mapInteractionTimer = null
     }
   },
 
@@ -329,6 +448,13 @@ Page({
     '附近常吃',
     '下班顺路',
     '随便不踩雷'
+  ],
+
+  // 随机推荐标签池（情绪引导标签）
+  RANDOM_TAG_POOL: [
+    '值得一试',
+    '顺路看看',
+    '或许好吃'
   ],
 
   // 根据距离选择推荐标签
@@ -343,6 +469,13 @@ Page({
     } else {
       return '随便不踩雷'
     }
+  },
+
+  // 生成随机推荐标签
+  getRandomRecommendTag() {
+    const pool = this.RANDOM_TAG_POOL
+    const randomIndex = Math.floor(Math.random() * pool.length)
+    return pool[randomIndex]
   },
 
   // 计算两点之间的距离（米）- 使用Haversine公式
@@ -375,14 +508,18 @@ Page({
 
     // 根据距离选择推荐标签（processRestaurantData中已计算，这里确保数据正确）
     nextRestaurant.tag = this.getRecommendTag(nextRestaurant.distance)
+    // 重新生成随机推荐标签（每次切换时重新随机）
+    nextRestaurant.randomTag = this.getRandomRecommendTag()
 
     this.setData({
       currentIndex: nextIndex,
-      restaurant: nextRestaurant,
-      mapLongitude: nextRestaurant.location.lng,
-      mapLatitude: nextRestaurant.location.lat,
-      mapScale: 16
+      restaurant: nextRestaurant
     })
+    
+    // 自动聚焦到新的面馆位置（用户位置+新面馆位置）
+    setTimeout(() => {
+      this.focusOnUserAndRestaurant()
+    }, 100)
   },
 
   // 打开导航

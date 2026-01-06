@@ -26,13 +26,16 @@
         enable-zoom="true"
         enable-scroll="true"
         enable-rotate="false"
+        enable-poi="false"
+        enable-building="false"
+        show-compass="false"
+        show-scale="false"
         bindtap="onMapTap"
+        bindregionchange="onMapRegionChange"
+        bindscalechange="onMapScaleChange"
       ></map>
-      <!-- 地图控制按钮 -->
-      <view class="map-control-buttons">
-        <view class="map-control-btn location-restaurant-btn" bindtap="moveToRestaurant">
-          <view class="location-pin-icon icon-red"></view>
-        </view>
+      <!-- 地图控制按钮（定位用户，默认隐藏） -->
+      <view class="map-control-buttons" wx:if="{{showLocationBtn}}">
         <view class="map-control-btn location-user-btn" bindtap="moveToUserLocation">
           <view class="location-pin-icon icon-blue"></view>
         </view>
@@ -44,10 +47,15 @@
       <!-- 店名 -->
       <view class="restaurant-name">{{restaurant.name}}</view>
       
-      <!-- 推荐标签 -->
-      <view class="restaurant-tag">
-        <view class="tag-badge">
+      <!-- 推荐标签组 -->
+      <view class="restaurant-tags">
+        <!-- 原有状态卡 -->
+        <view class="tag-badge tag-primary">
           <text class="tag-text">{{restaurant.tag}}</text>
+        </view>
+        <!-- 随机推荐状态卡 -->
+        <view class="tag-badge tag-random">
+          <text class="tag-text">{{restaurant.randomTag}}</text>
         </view>
       </view>
 
