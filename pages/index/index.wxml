@@ -59,9 +59,16 @@
         </view>
       </view>
 
-      <!-- 距离（突出显示） -->
-      <view class="restaurant-distance">
-        距离您 {{restaurant.distance}}m
+      <!-- 距离和步行时间 -->
+      <view class="restaurant-distance-info">
+        <!-- 距离信息（次要） -->
+        <view class="restaurant-distance">
+          距离 {{restaurant.distance}}m
+        </view>
+        <!-- 步行时间（高亮醒目） -->
+        <view class="restaurant-walking-time">
+          步行约 {{restaurant.walkingTime}} 分钟
+        </view>
       </view>
 
       <!-- 地址（弱化） -->

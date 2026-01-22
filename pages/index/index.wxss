@@ -205,10 +205,20 @@
   font-weight: 500;
 }
 
-.restaurant-distance {
-  font-size: 28rpx;
-  color: #666;
+.restaurant-distance-info {
   margin-bottom: 30rpx;
+}
+
+.restaurant-distance {
+  font-size: 24rpx;
+  color: #999;
+  margin-bottom: 8rpx;
+}
+
+.restaurant-walking-time {
+  font-size: 32rpx;
+  color: #ff6b35;
+  font-weight: bold;
 }
 
 

@@ -268,6 +268,8 @@ Page({
     const tag = this.getRecommendTag(Math.round(distance))
     // 生成随机推荐标签
     const randomTag = this.getRandomRecommendTag()
+    // 计算步行时间
+    const walkingTime = this.calculateWalkingTime(Math.round(distance))
 
     return {
       id: restaurant.id || restaurant._id || '',
@@ -275,6 +277,7 @@ Page({
       address: address,
       location: locationObj,
       distance: Math.round(distance),
+      walkingTime: walkingTime,
       mapMarkers: mapMarkers,
       tel: restaurant.tel || restaurant.phone || '',
       tag: tag,
@@ -488,6 +491,23 @@ Page({
       Math.sin(dLng / 2) * Math.sin(dLng / 2)
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
     return R * c
+  },
+
+  // 根据距离计算步行时间（分钟）
+  calculateWalkingTime(distanceInMeters) {
+    // 步行速度：4.5-5 km/h = 75 m/分钟
+    const WALKING_SPEED_M_PER_MIN = 75
+
+    // 计算时间（分钟）
+    const timeInMinutes = distanceInMeters / WALKING_SPEED_M_PER_MIN
+
+    // 边界处理：小于1分钟统一显示"约1分钟"
+    if (timeInMinutes < 1) {
+      return 1
+    }
+
+    // 1分钟及以上，向上取整
+    return Math.ceil(timeInMinutes)
   },
 
   // 换一家面馆（最多2家，在0和1之间切换）
