@@ -25,6 +25,20 @@
     >
       <view class="rk-no rk-no-{{index < 3 ? index + 1 : 'rest'}}">{{index + 1}}</view>
 
+      <!-- 门店缩略图 -->
+      <view class="rk-thumb">
+        <view class="rk-thumb-bowl"></view>
+        <image
+          wx:if="{{!imgErr[index]}}"
+          class="rk-thumb-img"
+          src="{{item.foodImage}}"
+          mode="aspectFill"
+          lazy-load="true"
+          data-index="{{index}}"
+          binderror="onImgErr"
+        ></image>
+      </view>
+
       <view class="rk-info">
         <view class="rk-name">{{item.name}}</view>
         <view class="rk-meta">

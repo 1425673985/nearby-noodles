@@ -4,7 +4,14 @@ Page({
     list: [], // 当前榜单列表
     activeTab: 'distance', // distance | rating | hot
     hasRating: false, // 数据中是否含评分（高德数据源才有）
-    ratingEmpty: false // 好评榜但无评分数据
+    ratingEmpty: false, // 好评榜但无评分数据
+    imgErr: {} // 每项门店图加载失败标记 { index: true }
+  },
+
+  // 门店图加载失败：回退到插画
+  onImgErr(e) {
+    const i = e.currentTarget.dataset.index
+    this.setData({ ['imgErr.' + i]: true })
   },
 
   onShow() {
@@ -28,7 +35,7 @@ Page({
   loadDistanceRank() {
     const all = this.getNearby().sort((a, b) => a.distance - b.distance)
     const hasRating = all.some((it) => it.ratingNum > 0)
-    this.setData({ list: all.slice(0, this.TOP_N), activeTab: 'distance', hasRating, ratingEmpty: false })
+    this.setData({ list: all.slice(0, this.TOP_N), activeTab: 'distance', hasRating, ratingEmpty: false, imgErr: {} })
   },
 
   // 好评榜：按评分降序（无评分的沉底），取前 10
@@ -46,7 +53,7 @@ Page({
       }
       return a.distance - b.distance
     })
-    this.setData({ list: sorted.slice(0, this.TOP_N), activeTab: 'rating', hasRating, ratingEmpty: false })
+    this.setData({ list: sorted.slice(0, this.TOP_N), activeTab: 'rating', hasRating, ratingEmpty: false, imgErr: {} })
   },
 
   // 未开放的标签（热门）
