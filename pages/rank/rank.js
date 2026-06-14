@@ -2,26 +2,54 @@
 Page({
   data: {
     list: [], // 当前榜单列表
-    activeTab: 'distance' // distance | hot | rating（后两者暂未开放）
+    activeTab: 'distance', // distance | rating | hot
+    hasRating: false, // 数据中是否含评分（高德数据源才有）
+    ratingEmpty: false // 好评榜但无评分数据
   },
 
   onShow() {
-    this.loadDistanceRank()
+    // 进入或切回时按当前榜单刷新
+    if (this.data.activeTab === 'rating') {
+      this.loadRatingRank()
+    } else {
+      this.loadDistanceRank()
+    }
   },
 
-  // 距离排行：直接读取全局已排序的列表
-  loadDistanceRank() {
+  getNearby() {
     const app = getApp()
-    const nearbyList = (app.globalData && app.globalData.nearbyList) || []
-    // 已按距离升序，这里再保险排一次
-    const list = nearbyList.slice().sort((a, b) => a.distance - b.distance)
-    this.setData({ list, activeTab: 'distance' })
+    return ((app.globalData && app.globalData.nearbyList) || []).slice()
   },
 
-  // 未开放的标签（热门 / 好评）
+  // 距离榜：按距离升序
+  loadDistanceRank() {
+    const list = this.getNearby().sort((a, b) => a.distance - b.distance)
+    const hasRating = list.some((it) => it.ratingNum > 0)
+    this.setData({ list, activeTab: 'distance', hasRating, ratingEmpty: false })
+  },
+
+  // 好评榜：按评分降序（无评分的沉底）
+  loadRatingRank() {
+    const all = this.getNearby()
+    const hasRating = all.some((it) => it.ratingNum > 0)
+    if (!hasRating) {
+      // 没有评分数据（未配置高德），给出提示
+      this.setData({ list: [], activeTab: 'rating', hasRating, ratingEmpty: true })
+      return
+    }
+    const list = all.sort((a, b) => {
+      if (b.ratingNum !== a.ratingNum) {
+        return b.ratingNum - a.ratingNum
+      }
+      return a.distance - b.distance
+    })
+    this.setData({ list, activeTab: 'rating', hasRating, ratingEmpty: false })
+  },
+
+  // 未开放的标签（热门）
   onTabDisabled() {
     wx.showToast({
-      title: '该榜单即将上线',
+      title: '热门榜即将上线',
       icon: 'none'
     })
   },

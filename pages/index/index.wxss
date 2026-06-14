@@ -275,6 +275,22 @@
   border: 1rpx solid var(--brand-line);
 }
 
+/* 评分 / 人均 */
+.meta {
+  display: flex;
+  align-items: center;
+  margin-top: 12rpx;
+  font-size: 24rpx;
+}
+.meta-rating {
+  color: #f5a623;
+  font-weight: 700;
+}
+.meta-cost {
+  color: var(--text-2);
+  margin-left: 20rpx;
+}
+
 /* 数据面板 */
 .stat-panel {
   display: flex;

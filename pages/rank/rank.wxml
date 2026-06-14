@@ -4,15 +4,15 @@
   <!-- 榜单切换 -->
   <view class="rank-tabs">
     <view class="rk-tab {{activeTab === 'distance' ? 'active' : ''}}" bindtap="loadDistanceRank">距离榜</view>
+    <view class="rk-tab {{activeTab === 'rating' ? 'active' : ''}}" bindtap="loadRatingRank">好评榜</view>
     <view class="rk-tab disabled" bindtap="onTabDisabled">
       热门榜<text class="rk-soon">待开放</text>
     </view>
-    <view class="rk-tab disabled" bindtap="onTabDisabled">
-      好评榜<text class="rk-soon">待开放</text>
-    </view>
   </view>
 
-  <view class="rank-sub" wx:if="{{list.length}}">按由近到远排序 · 共 {{list.length}} 家</view>
+  <view class="rank-sub" wx:if="{{list.length}}">
+    {{activeTab === 'rating' ? '按评分由高到低排序' : '按由近到远排序'}} · 共 {{list.length}} 家
+  </view>
 
   <!-- 列表 -->
   <scroll-view scroll-y="true" class="rank-list" wx:if="{{list.length}}">
@@ -29,21 +29,38 @@
         <view class="rk-name">{{item.name}}</view>
         <view class="rk-meta">
           <text class="rk-cat">{{item.category}}</text>
+          <text class="rk-star" wx:if="{{item.rating}}">★ {{item.rating}}</text>
+          <text class="rk-cost" wx:if="{{item.cost}}">¥{{item.cost}}</text>
           <text class="rk-dot">·</text>
-          <text class="rk-walk">步行约 {{item.walkingTime}} 分钟</text>
+          <text class="rk-walk">步行 {{item.walkingTime}} 分钟</text>
         </view>
       </view>
 
       <view class="rk-right">
-        <view class="rk-dist"><text class="rk-dist-num">{{item.distance}}</text><text class="rk-dist-unit">m</text></view>
+        <view class="rk-dist" wx:if="{{activeTab === 'rating' && item.rating}}">
+          <text class="rk-dist-num rk-star-num">{{item.rating}}</text><text class="rk-dist-unit">分</text>
+        </view>
+        <view class="rk-dist" wx:else>
+          <text class="rk-dist-num">{{item.distance}}</text><text class="rk-dist-unit">m</text>
+        </view>
         <view class="rk-go">去这家</view>
       </view>
     </view>
 
-    <view class="rank-foot">仅按直线距离排序 · 数据来自腾讯地图</view>
+    <view class="rank-foot">
+      {{activeTab === 'rating' ? '评分数据来自高德地图，覆盖率视店铺而定' : '仅按直线距离排序'}}
+    </view>
   </scroll-view>
 
-  <!-- 空状态 -->
+  <!-- 好评榜但无评分数据 -->
+  <view class="rank-empty" wx:elif="{{ratingEmpty}}">
+    <view class="bowl bowl-empty"></view>
+    <view class="empty-title">暂无评分数据</view>
+    <view class="empty-desc">好评榜需要高德数据源。在 config.js 配置 AMAP_KEY 后即可启用</view>
+    <button class="primary-btn tap-shrink" bindtap="loadDistanceRank">先看距离榜</button>
+  </view>
+
+  <!-- 完全无数据 -->
   <view class="rank-empty" wx:else>
     <view class="bowl bowl-empty"></view>
     <view class="empty-title">还没有附近面馆数据</view>

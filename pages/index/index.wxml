@@ -118,6 +118,11 @@
               <view class="tag tag-primary">{{restaurant.tag}}</view>
               <view class="tag tag-random">{{restaurant.randomTag}}</view>
             </view>
+            <!-- 评分 / 人均（高德数据源才有，无则隐藏） -->
+            <view class="meta" wx:if="{{restaurant.rating || restaurant.cost}}">
+              <text class="meta-rating" wx:if="{{restaurant.rating}}">★ {{restaurant.rating}}</text>
+              <text class="meta-cost" wx:if="{{restaurant.cost}}">人均 ¥{{restaurant.cost}}</text>
+            </view>
           </view>
         </view>
 

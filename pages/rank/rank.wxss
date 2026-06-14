@@ -111,7 +111,17 @@
   border-radius: 8rpx;
   font-weight: 600;
 }
+.rk-star {
+  color: #f5a623;
+  font-weight: 700;
+  margin-left: 12rpx;
+}
+.rk-cost {
+  color: var(--text-2);
+  margin-left: 12rpx;
+}
 .rk-dot { margin: 0 10rpx; }
+.rk-star-num { color: #f5a623; }
 
 /* 右侧 */
 .rk-right {

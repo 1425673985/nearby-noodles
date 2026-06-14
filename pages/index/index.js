@@ -129,7 +129,12 @@ Page({
     })
   },
 
-  // 搜索附近面馆
+  // 是否启用高德数据源（配置了有效高德 Key 时，可获取评分/人均/图片）
+  useAmap() {
+    return !!(config.AMAP_KEY && config.AMAP_KEY !== '你的高德Key')
+  },
+
+  // 搜索附近面馆（自动选择数据源）
   searchNearbyRestaurants(location) {
     // 防止重复并发请求（连续点击/重试时只保留一次在途请求，避免浪费配额）
     if (this._searching) {
@@ -142,7 +147,15 @@ Page({
       error: null
     })
 
-    // 使用腾讯地图 SDK 搜索附近面馆
+    if (this.useAmap()) {
+      this.searchByAmap(location)
+    } else {
+      this.searchByTencent(location)
+    }
+  },
+
+  // 腾讯地图搜索（基础字段：无评分/人均/图片）
+  searchByTencent(location) {
     qqmapsdk.search({
       keyword: config.SEARCH_KEYWORD,
       location: {
@@ -151,62 +164,129 @@ Page({
       },
       radius: config.SEARCH_RADIUS,
       success: (res) => {
-        const restaurants = res.data || []
-        if (restaurants.length > 0) {
-          // 限制最多只显示2家
-          const displayRestaurants = restaurants.slice(0, 2)
-          
-          // 处理第一个面馆的数据
-          const firstRestaurant = this.processRestaurantData(displayRestaurants[0], location)
-          
-          // 根据距离选择推荐标签
-          firstRestaurant.tag = this.getRecommendTag(firstRestaurant.distance)
-          // 生成随机推荐标签
-          firstRestaurant.randomTag = this.getRandomRecommendTag()
-          
-          this.setData({
-            searchedRestaurants: displayRestaurants,
-            currentIndex: 0,
-            restaurant: firstRestaurant,
-            foodImgError: false,
-            loading: false,
-            error: null
-          })
+        this.applySearchResults(res.data || [], location)
+      },
+      fail: (err) => {
+        this.handleSearchFail(err)
+      },
+      complete: () => {
+        this._searching = false
+      }
+    })
+  },
 
-          // 保存完整列表（按距离升序）到全局，供「附近排行」页使用（不额外发请求）
-          const nearbyList = restaurants
-            .map((item) => this.processRestaurantData(item, location))
-            .sort((a, b) => a.distance - b.distance)
-          const app = getApp()
-          app.globalData.nearbyList = nearbyList
-          app.globalData.userLocation = location
-
-          // 自动聚焦用户位置和面馆位置（适合步行）
-          setTimeout(() => {
-            this.focusOnUserAndRestaurant()
-          }, 300)
+  // 高德地图搜索（含评分 rating / 人均 cost / 门店图 photos）
+  searchByAmap(location) {
+    wx.request({
+      url: 'https://restapi.amap.com/v3/place/around',
+      method: 'GET',
+      data: {
+        key: config.AMAP_KEY,
+        location: `${location.longitude},${location.latitude}`, // 高德：经度,纬度
+        keywords: config.SEARCH_KEYWORD,
+        radius: config.SEARCH_RADIUS,
+        offset: 25,
+        page: 1,
+        extensions: 'all'
+      },
+      success: (res) => {
+        const data = res.data || {}
+        if (data.status === '1' && Array.isArray(data.pois)) {
+          const list = data.pois.map((poi) => this.normalizeAmapPoi(poi))
+          this.applySearchResults(list, location)
+        } else if (data.infocode === '10003' || /CUQPS|DAILY|LIMIT|QUOTA/i.test(data.info || '')) {
+          // 高德配额相关错误，复用配额提示
+          this.handleSearchFail({ status: 121, message: data.info })
         } else {
-          this.setData({
-            loading: false,
-            error: `附近${config.SEARCH_RADIUS / 1000}km内没有找到面馆`
-          })
+          this.handleSearchFail({ message: data.info || '搜索面馆失败' })
         }
       },
       fail: (err) => {
-        console.error('搜索面馆失败', err)
-        // status 121：地图 Key 当日调用量已达上限
-        const quotaExceeded = err && (err.status === 121 || err.status === '121')
-        this.setData({
-          loading: false,
-          error: quotaExceeded
-            ? '今日地图服务额度已用完，请明天再试，或在控制台更换/升级地图 Key'
-            : (err && err.message) || '搜索面馆失败，请稍后重试'
-        })
+        this.handleSearchFail(err)
       },
       complete: () => {
-        // 无论成功失败，释放在途请求标记
         this._searching = false
       }
+    })
+  },
+
+  // 高德 POI → 统一数据结构（兼容 processRestaurantData）
+  normalizeAmapPoi(poi) {
+    const pick = (v) => (v === undefined || v === null || Array.isArray(v) ? '' : String(v))
+    // 高德 location 为字符串："经度,纬度"
+    let lat, lng
+    if (typeof poi.location === 'string' && poi.location.indexOf(',') !== -1) {
+      const arr = poi.location.split(',')
+      lng = parseFloat(arr[0])
+      lat = parseFloat(arr[1])
+    }
+    const biz = poi.biz_ext || {}
+    const photoUrl = Array.isArray(poi.photos) && poi.photos[0] ? pick(poi.photos[0].url) : ''
+    return {
+      id: pick(poi.id),
+      title: pick(poi.name),
+      location: lat && lng ? { lat, lng } : undefined,
+      _distance: poi.distance ? parseFloat(poi.distance) : 0,
+      address: pick(poi.address),
+      tel: pick(poi.tel),
+      category: pick(poi.type),
+      rating: pick(biz.rating),
+      cost: pick(biz.cost),
+      // 图片需为 https 才能在真机加载；http 的丢弃，交由插画兜底
+      amapPhoto: photoUrl.indexOf('https') === 0 ? photoUrl : ''
+    }
+  },
+
+  // 统一处理搜索结果（两种数据源共用）
+  applySearchResults(restaurants, location) {
+    if (!restaurants || restaurants.length === 0) {
+      this.setData({
+        loading: false,
+        error: `附近${config.SEARCH_RADIUS / 1000}km内没有找到面馆`
+      })
+      return
+    }
+
+    // 处理并按距离升序
+    const fullList = restaurants
+      .map((item) => this.processRestaurantData(item, location))
+      .sort((a, b) => a.distance - b.distance)
+
+    // 首页展示最近的 2 家，支持「换一家」
+    const displayRestaurants = fullList.slice(0, 2)
+    const firstRestaurant = Object.assign({}, displayRestaurants[0])
+    firstRestaurant.randomTag = this.getRandomRecommendTag()
+
+    this.setData({
+      searchedRestaurants: displayRestaurants,
+      currentIndex: 0,
+      restaurant: firstRestaurant,
+      foodImgError: false,
+      loading: false,
+      error: null
+    })
+
+    // 完整列表存全局，供「附近排行」页使用（不额外发请求）
+    const app = getApp()
+    app.globalData.nearbyList = fullList
+    app.globalData.userLocation = location
+
+    // 自动聚焦用户位置和面馆位置（适合步行）
+    setTimeout(() => {
+      this.focusOnUserAndRestaurant()
+    }, 300)
+  },
+
+  // 统一的搜索失败处理
+  handleSearchFail(err) {
+    console.error('搜索面馆失败', err)
+    // status 121 / 高德配额：当日调用量已达上限
+    const quotaExceeded = err && (err.status === 121 || err.status === '121')
+    this.setData({
+      loading: false,
+      error: quotaExceeded
+        ? '今日地图服务额度已用完，请明天再试，或在控制台更换/升级地图 Key'
+        : (err && err.message) || '搜索面馆失败，请稍后重试'
     })
   },
 
@@ -284,8 +364,13 @@ Page({
 
     // 识别面食品类（用于食欲配图 + 品类标签）
     const food = this.resolveFood(name, restaurant.category)
-    // 门脸图优先级：街景（可选开关）> 品类配图 > 兜底插画
-    const foodImage = this.buildHeroImage(food.img, lat, lng)
+    // 门脸图优先级：高德真实门店图 > 街景（可选开关）> 品类配图 > 兜底插画
+    const amapPhoto = restaurant.amapPhoto || ''
+    const foodImage = amapPhoto || this.buildHeroImage(food.img, lat, lng)
+
+    // 评分 / 人均（高德数据源才有；腾讯为空，自动隐藏）
+    const ratingNum = restaurant.rating ? parseFloat(restaurant.rating) : 0
+    const costNum = restaurant.cost ? parseFloat(restaurant.cost) : 0
 
     return {
       id: restaurant.id || restaurant._id || '',
@@ -299,7 +384,10 @@ Page({
       tag: tag,
       randomTag: randomTag,
       category: food.label,
-      foodImage: foodImage
+      foodImage: foodImage,
+      rating: ratingNum > 0 ? ratingNum.toFixed(1) : '', // 展示用字符串
+      ratingNum: ratingNum, // 排序用数值
+      cost: costNum > 0 ? Math.round(costNum) : '' // 人均（元）
     }
   },
 
@@ -586,22 +674,16 @@ Page({
 
   // 换一家面馆（最多2家，在0和1之间切换）
   changeRestaurant() {
-    const { searchedRestaurants, currentIndex, userLocation } = this.data
-    
+    const { searchedRestaurants, currentIndex } = this.data
+
     // 如果只有1家，点击无变化
     if (searchedRestaurants.length <= 1) {
       return
     }
 
-    // 如果有2家，在0和1之间来回切换
+    // searchedRestaurants 已是处理好的数据，直接切换即可
     const nextIndex = currentIndex === 0 ? 1 : 0
-    const nextRestaurant = this.processRestaurantData(
-      searchedRestaurants[nextIndex],
-      userLocation
-    )
-
-    // 根据距离选择推荐标签（processRestaurantData中已计算，这里确保数据正确）
-    nextRestaurant.tag = this.getRecommendTag(nextRestaurant.distance)
+    const nextRestaurant = Object.assign({}, searchedRestaurants[nextIndex])
     // 重新生成随机推荐标签（每次切换时重新随机）
     nextRestaurant.randomTag = this.getRandomRecommendTag()
 

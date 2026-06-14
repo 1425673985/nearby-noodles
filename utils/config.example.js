@@ -3,10 +3,16 @@
 // ⚠️ utils/config.js 已被 .gitignore 忽略，请勿提交真实 Key 到仓库。
 
 module.exports = {
-  // 腾讯地图 API Key
+  // 腾讯地图 API Key（基础数据：店名/地址/距离/品类/电话）
   // 获取方式：https://lbs.qq.com/console/mykey.html
   // 建议在控制台为该 Key 绑定小程序 AppID 白名单，并设置每日调用上限。
   TENCENT_MAP_KEY: '你的腾讯地图Key',
+
+  // 高德地图 Web 服务 Key（进阶数据：评分 rating / 人均 cost / 门店图）
+  // 获取方式：https://console.amap.com/dev/key/app（服务平台选「Web服务」）
+  // 配置后自动切换为高德数据源，可启用「好评榜」与人均显示（覆盖率视店铺而定）。
+  // ⚠️ 需在「服务器域名 → request 合法域名」添加 https://restapi.amap.com
+  AMAP_KEY: '你的高德Key',
 
   // 搜索半径（米）
   SEARCH_RADIUS: 3000,
