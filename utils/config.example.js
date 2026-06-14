@@ -13,6 +13,8 @@ module.exports = {
   // 配置后自动切换为高德数据源，可启用「好评榜」与人均显示（覆盖率视店铺而定）。
   // ⚠️ 需在「服务器域名 → request 合法域名」添加 https://restapi.amap.com
   AMAP_KEY: '你的高德Key',
+  // 高德数字签名「安全密钥」：若 Key 开启了「数字签名校验」则必填，否则留空字符串
+  AMAP_SECRET: '',
 
   // 搜索半径（米）
   SEARCH_RADIUS: 3000,

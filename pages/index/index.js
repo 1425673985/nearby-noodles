@@ -1,6 +1,7 @@
 // index.js
 const QQMapWX = require('../../libs/qqmap-wx-jssdk.js')
 const config = require('../../utils/config.js')
+const md5 = require('../../utils/md5.js')
 
 // 初始化腾讯地图 SDK
 const qqmapsdk = new QQMapWX({
@@ -177,18 +178,28 @@ Page({
 
   // 高德地图搜索（含评分 rating / 人均 cost / 门店图 photos）
   searchByAmap(location) {
+    const params = {
+      key: config.AMAP_KEY,
+      location: `${location.longitude},${location.latitude}`, // 高德：经度,纬度
+      keywords: config.SEARCH_KEYWORD,
+      radius: config.SEARCH_RADIUS,
+      offset: 25,
+      page: 1,
+      extensions: 'all'
+    }
+    // 数字签名：开启「安全密钥」后必须签名（sig = md5(按key升序拼接的参数串 + 私钥)）
+    if (config.AMAP_SECRET) {
+      const signStr = Object.keys(params)
+        .sort()
+        .map((k) => `${k}=${params[k]}`)
+        .join('&')
+      params.sig = md5(signStr + config.AMAP_SECRET)
+    }
+
     wx.request({
       url: 'https://restapi.amap.com/v3/place/around',
       method: 'GET',
-      data: {
-        key: config.AMAP_KEY,
-        location: `${location.longitude},${location.latitude}`, // 高德：经度,纬度
-        keywords: config.SEARCH_KEYWORD,
-        radius: config.SEARCH_RADIUS,
-        offset: 25,
-        page: 1,
-        extensions: 'all'
-      },
+      data: params,
       success: (res) => {
         const data = res.data || {}
         if (data.status === '1' && Array.isArray(data.pois)) {
