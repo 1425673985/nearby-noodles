@@ -31,11 +31,11 @@
 }
 
 .grip {
-  width: 72rpx;
-  height: 8rpx;
+  width: 64rpx;
+  height: 7rpx;
   border-radius: 8rpx;
   background: #e6e3df;
-  margin: 18rpx auto 8rpx;
+  margin: 14rpx auto 6rpx;
 }
 
 /* 重新定位按钮：贴在底卡上沿右侧 */
@@ -82,15 +82,15 @@
 
 /* ============ 底卡内容 ============ */
 .sheet-body {
-  padding-top: 14rpx;
+  padding-top: 8rpx;
 }
 
 /* —— 食欲门脸图 —— */
 .food-hero {
   position: relative;
   width: 100%;
-  height: 240rpx;
-  border-radius: 24rpx;
+  height: 168rpx;
+  border-radius: 22rpx;
   overflow: hidden;
   background: linear-gradient(135deg, #ffb088, #ff7a45);
 }
@@ -106,16 +106,16 @@
   left: 0;
   right: 0;
   bottom: 0;
-  height: 120rpx;
+  height: 88rpx;
   z-index: 3;
   background: linear-gradient(180deg, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.42));
 }
 .food-cat {
   position: absolute;
-  left: 22rpx;
-  bottom: 18rpx;
+  left: 20rpx;
+  bottom: 12rpx;
   z-index: 4;
-  font-size: 30rpx;
+  font-size: 26rpx;
   font-weight: 700;
   color: #fff;
   text-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.35);
@@ -144,29 +144,29 @@
 }
 .illus-bowl {
   position: relative;
-  width: 150rpx;
-  height: 80rpx;
+  width: 118rpx;
+  height: 60rpx;
   background: #fff;
-  border-radius: 12rpx 12rpx 80rpx 80rpx;
-  box-shadow: 0 10rpx 24rpx rgba(0, 0, 0, 0.12);
+  border-radius: 10rpx 10rpx 60rpx 60rpx;
+  box-shadow: 0 8rpx 20rpx rgba(0, 0, 0, 0.12);
 }
 .illus-bowl::before {
   content: '';
   position: absolute;
-  top: -10rpx;
-  left: -12rpx;
-  right: -12rpx;
-  height: 26rpx;
+  top: -8rpx;
+  left: -10rpx;
+  right: -10rpx;
+  height: 20rpx;
   border-radius: 50%;
   background: #fff;
 }
 .illus-noodle {
   position: absolute;
-  top: -2rpx;
+  top: -1rpx;
   left: 50%;
   transform: translateX(-50%);
-  width: 96rpx;
-  height: 20rpx;
+  width: 76rpx;
+  height: 15rpx;
   border-radius: 50%;
   background: #ffd9a0;
   z-index: 2;
@@ -174,33 +174,33 @@
 .illus-steam,
 .illus-steam.s2 {
   position: absolute;
-  top: -46rpx;
-  left: 56rpx;
-  width: 7rpx;
-  height: 38rpx;
+  top: -36rpx;
+  left: 44rpx;
+  width: 6rpx;
+  height: 30rpx;
   border-radius: 8rpx;
   background: rgba(255, 255, 255, 0.7);
   animation: steam 2.4s ease-in-out infinite;
   z-index: 2;
 }
 .illus-steam.s2 {
-  left: 90rpx;
+  left: 70rpx;
   animation-delay: 0.7s;
 }
 .illus-chopstick {
   position: absolute;
-  top: 18rpx;
+  top: 14rpx;
   left: 50%;
-  width: 6rpx;
-  height: 110rpx;
+  width: 5rpx;
+  height: 84rpx;
   background: #8a5a2b;
   border-radius: 4rpx;
-  transform: translateX(40rpx) rotate(14deg);
+  transform: translateX(32rpx) rotate(14deg);
   transform-origin: top center;
   z-index: 3;
 }
 .illus-chopstick.c2 {
-  transform: translateX(54rpx) rotate(18deg);
+  transform: translateX(44rpx) rotate(18deg);
   opacity: 0.85;
 }
 
@@ -208,7 +208,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: 22rpx;
+  margin-top: 16rpx;
 }
 .name {
   font-size: 44rpx;
@@ -224,8 +224,8 @@
 /* 拨打按钮 */
 .call-btn {
   flex-shrink: 0;
-  width: 72rpx;
-  height: 72rpx;
+  width: 64rpx;
+  height: 64rpx;
   margin-left: 16rpx;
   border-radius: 50%;
   background: var(--brand-soft);
@@ -237,11 +237,10 @@
 .call-icon {
   width: 34rpx;
   height: 34rpx;
-  border-radius: 50% 50% 50% 8rpx;
-  border: 5rpx solid var(--brand);
-  border-right-color: transparent;
-  border-top-color: transparent;
-  transform: rotate(8deg);
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='%23ff6b35'%3E%3Cpath%20d='M6.62%2010.79c1.44%202.83%203.76%205.14%206.59%206.59l2.2-2.2c.27-.27.67-.36%201.02-.24%201.12.37%202.33.57%203.57.57.55%200%201%20.45%201%201V20c0%20.55-.45%201-1%201-9.39%200-17-7.61-17-17%200-.55.45-1%201-1h3.5c.55%200%201%20.45%201%201%200%201.25.2%202.45.57%203.57.11.35.03.74-.25%201.02l-2.2%202.2z'/%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
 }
 
 /* 标签 */
@@ -249,7 +248,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: 14rpx;
-  margin-top: 18rpx;
+  margin-top: 14rpx;
 }
 .tag {
   font-size: 24rpx;
@@ -275,9 +274,9 @@
   align-items: stretch;
   background: #faf8f6;
   border: 1rpx solid var(--line);
-  border-radius: 24rpx;
-  padding: 26rpx 12rpx;
-  margin-top: 28rpx;
+  border-radius: 22rpx;
+  padding: 18rpx 12rpx;
+  margin-top: 18rpx;
 }
 .stat {
   flex: 1;
@@ -303,10 +302,10 @@
 .stat-value {
   display: flex;
   align-items: baseline;
-  margin-top: 10rpx;
+  margin-top: 6rpx;
 }
 .stat-value .num {
-  font-size: 56rpx;
+  font-size: 48rpx;
   font-weight: 800;
   line-height: 1;
   color: var(--brand);
@@ -357,7 +356,7 @@
 .address {
   display: flex;
   align-items: center;
-  margin-top: 24rpx;
+  margin-top: 16rpx;
 }
 .pin-icon {
   width: 22rpx;
@@ -400,12 +399,12 @@
 .action-bar {
   display: flex;
   gap: 22rpx;
-  margin-top: 30rpx;
+  margin-top: 20rpx;
 }
 .act {
   flex: 1;
-  height: 92rpx;
-  line-height: 92rpx;
+  height: 86rpx;
+  line-height: 86rpx;
   text-align: center;
   border-radius: 999rpx;
   font-size: 32rpx;
