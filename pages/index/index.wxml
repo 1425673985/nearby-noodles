@@ -115,8 +115,10 @@
             </view>
             <view class="tags">
               <view class="tag tag-cat">{{restaurant.category}}</view>
-              <view class="tag tag-primary">{{restaurant.tag}}</view>
-              <view class="tag tag-random">{{restaurant.randomTag}}</view>
+              <!-- 真实招牌菜 -->
+              <view class="tag tag-sign" wx:for="{{restaurant.signature}}" wx:key="*this">{{item}}</view>
+              <!-- 真实营业状态 -->
+              <view class="tag tag-open {{restaurant.openClosed ? 'tag-closed' : ''}}" wx:if="{{restaurant.openText}}">{{restaurant.openText}}</view>
             </view>
             <!-- 评分 / 人均（高德数据源才有，无则隐藏） -->
             <view class="meta" wx:if="{{restaurant.rating || restaurant.cost}}">

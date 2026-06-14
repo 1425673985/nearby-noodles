@@ -233,6 +233,11 @@ Page({
     }
     const biz = poi.biz_ext || {}
     const photoUrl = Array.isArray(poi.photos) && poi.photos[0] ? pick(poi.photos[0].url) : ''
+    // 招牌菜/特色（真实字段）：优先 atag，其次 tag，再次 keytag
+    const signRaw = pick(poi.atag) || pick(poi.tag) || pick(poi.keytag)
+    const signature = signRaw
+      ? signRaw.split(/[,，]/).map((s) => s.trim()).filter((s) => s).slice(0, 2)
+      : []
     return {
       id: pick(poi.id),
       title: pick(poi.name),
@@ -243,9 +248,41 @@ Page({
       category: pick(poi.type),
       rating: pick(biz.rating),
       cost: pick(biz.cost),
+      signature: signature, // 真实招牌菜
+      openTime: pick(biz.open_time), // 营业时间
       // 图片需为 https 才能在真机加载；http 的丢弃，交由插画兜底
       amapPhoto: photoUrl.indexOf('https') === 0 ? photoUrl : ''
     }
+  },
+
+  // 根据营业时间字符串计算营业状态
+  // 支持："07:00-21:00"、"24小时营业"、"07:00-14:00 16:30-20:00"
+  computeOpenStatus(openTime) {
+    if (!openTime) {
+      return { text: '', closed: false }
+    }
+    if (openTime.indexOf('24小时') !== -1) {
+      return { text: '营业中', closed: false }
+    }
+    const ranges = openTime.match(/\d{1,2}:\d{2}\s*-\s*\d{1,2}:\d{2}/g)
+    if (!ranges || ranges.length === 0) {
+      return { text: '', closed: false }
+    }
+    const now = new Date()
+    const cur = now.getHours() * 60 + now.getMinutes()
+    const toMin = (hhmm) => {
+      const [h, m] = hhmm.split(':').map((n) => parseInt(n, 10))
+      return h * 60 + m
+    }
+    for (const r of ranges) {
+      const parts = r.split('-')
+      const start = toMin(parts[0].trim())
+      const end = toMin(parts[1].trim())
+      if (cur >= start && cur <= end) {
+        return { text: '营业中', closed: false }
+      }
+    }
+    return { text: '已打烊', closed: true }
   },
 
   // 统一处理搜索结果（两种数据源共用）
@@ -265,8 +302,7 @@ Page({
 
     // 首页展示最近的 2 家，支持「换一家」
     const displayRestaurants = fullList.slice(0, 2)
-    const firstRestaurant = Object.assign({}, displayRestaurants[0])
-    firstRestaurant.randomTag = this.getRandomRecommendTag()
+    const firstRestaurant = displayRestaurants[0]
 
     this.setData({
       searchedRestaurants: displayRestaurants,
@@ -366,10 +402,6 @@ Page({
           }
         }]
 
-    // 根据距离选择推荐标签
-    const tag = this.getRecommendTag(Math.round(distance))
-    // 生成随机推荐标签
-    const randomTag = this.getRandomRecommendTag()
     // 计算步行时间
     const walkingTime = this.calculateWalkingTime(Math.round(distance))
 
@@ -383,6 +415,10 @@ Page({
     const ratingNum = restaurant.rating ? parseFloat(restaurant.rating) : 0
     const costNum = restaurant.cost ? parseFloat(restaurant.cost) : 0
 
+    // 招牌菜（真实）+ 营业状态（真实，按当前时间计算）
+    const signature = Array.isArray(restaurant.signature) ? restaurant.signature : []
+    const openStatus = this.computeOpenStatus(restaurant.openTime || '')
+
     return {
       id: restaurant.id || restaurant._id || '',
       name: name,
@@ -392,13 +428,14 @@ Page({
       walkingTime: walkingTime,
       mapMarkers: mapMarkers,
       tel: restaurant.tel || restaurant.phone || '',
-      tag: tag,
-      randomTag: randomTag,
       category: food.label,
       foodImage: foodImage,
       rating: ratingNum > 0 ? ratingNum.toFixed(1) : '', // 展示用字符串
       ratingNum: ratingNum, // 排序用数值
-      cost: costNum > 0 ? Math.round(costNum) : '' // 人均（元）
+      cost: costNum > 0 ? Math.round(costNum) : '', // 人均（元）
+      signature: signature, // 真实招牌菜（高德）
+      openText: openStatus.text, // 营业中 / 已打烊 / ''
+      openClosed: openStatus.closed
     }
   },
 
@@ -618,42 +655,6 @@ Page({
     }
   },
 
-  // 标签池（固定文案）
-  TAG_POOL: [
-    '就近解决',
-    '附近常吃',
-    '下班顺路',
-    '随便不踩雷'
-  ],
-
-  // 随机推荐标签池（情绪引导标签）
-  RANDOM_TAG_POOL: [
-    '值得一试',
-    '顺路看看',
-    '或许好吃'
-  ],
-
-  // 根据距离选择推荐标签
-  getRecommendTag(distance) {
-    // 距离小于150米：就近解决
-    // 距离150-300米：附近常吃
-    // 距离大于300米：随便不踩雷
-    if (distance < 150) {
-      return '就近解决'
-    } else if (distance < 300) {
-      return '附近常吃'
-    } else {
-      return '随便不踩雷'
-    }
-  },
-
-  // 生成随机推荐标签
-  getRandomRecommendTag() {
-    const pool = this.RANDOM_TAG_POOL
-    const randomIndex = Math.floor(Math.random() * pool.length)
-    return pool[randomIndex]
-  },
-
   // 计算两点之间的距离（米）- 使用Haversine公式
   calculateDistance(lat1, lng1, lat2, lng2) {
     const R = 6371000 // 地球半径（米）
@@ -694,9 +695,7 @@ Page({
 
     // searchedRestaurants 已是处理好的数据，直接切换即可
     const nextIndex = currentIndex === 0 ? 1 : 0
-    const nextRestaurant = Object.assign({}, searchedRestaurants[nextIndex])
-    // 重新生成随机推荐标签（每次切换时重新随机）
-    nextRestaurant.randomTag = this.getRandomRecommendTag()
+    const nextRestaurant = searchedRestaurants[nextIndex]
 
     this.setData({
       currentIndex: nextIndex,

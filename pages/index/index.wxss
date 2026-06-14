@@ -264,15 +264,22 @@
   color: #fff;
   background: rgba(31, 31, 34, 0.82);
 }
-.tag-primary {
-  color: #fff;
-  background: linear-gradient(135deg, #ff8a5c, var(--brand));
-  box-shadow: 0 4rpx 12rpx rgba(255, 107, 53, 0.28);
-}
-.tag-random {
+/* 真实招牌菜 */
+.tag-sign {
   color: var(--brand-deep);
   background: var(--brand-soft);
   border: 1rpx solid var(--brand-line);
+}
+/* 营业状态 */
+.tag-open {
+  color: #1a8a4a;
+  background: #e8f7ee;
+  border: 1rpx solid #bfe8cf;
+}
+.tag-open.tag-closed {
+  color: #8a8a8f;
+  background: #f1f0ee;
+  border-color: #e3e1dd;
 }
 
 /* 评分 / 人均 */
