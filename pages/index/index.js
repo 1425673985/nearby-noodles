@@ -480,7 +480,7 @@ Page({
             latitude: restaurant.location.lat
           }
         ],
-        padding: [90, 50, 360, 50], // 上/右/下/左：底部留足空间，避免标记被悬浮底卡遮挡
+        padding: [80, 50, 300, 50], // 上/右/下/左：底部留足空间，避免标记被悬浮底卡遮挡
         fail: (err) => {
           console.warn('地图自动聚焦失败，使用setData方式', err)
         }

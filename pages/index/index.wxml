@@ -77,47 +77,42 @@
       <view class="grip"></view>
 
       <view class="sheet-body">
-        <!-- 食欲门脸图 -->
-        <view class="food-hero">
-          <!-- 兜底插画（始终在底层；有真实配图时被图片盖住） -->
-          <view class="food-illus">
-            <view class="illus-bowl">
-              <view class="illus-noodle"></view>
-              <view class="illus-steam"></view>
-              <view class="illus-steam s2"></view>
+        <!-- 紧凑头部：左侧食欲小图 + 右侧店名/标签 -->
+        <view class="head-card">
+          <!-- 食欲缩略图 -->
+          <view class="thumb">
+            <view class="food-illus">
+              <view class="illus-bowl">
+                <view class="illus-noodle"></view>
+                <view class="illus-steam"></view>
+                <view class="illus-steam s2"></view>
+              </view>
             </view>
-            <view class="illus-chopstick"></view>
-            <view class="illus-chopstick c2"></view>
+            <image
+              wx:if="{{!foodImgError}}"
+              class="food-photo"
+              src="{{restaurant.foodImage}}"
+              mode="aspectFill"
+              lazy-load="true"
+              binderror="onFoodImgError"
+            ></image>
+            <view class="thumb-index" wx:if="{{searchedRestaurants.length > 1}}">{{currentIndex + 1}}/{{searchedRestaurants.length}}</view>
           </view>
-          <!-- 真实门脸图（街景或品类配图），失败则隐藏露出插画 -->
-          <image
-            wx:if="{{!foodImgError}}"
-            class="food-photo"
-            src="{{restaurant.foodImage}}"
-            mode="aspectFill"
-            lazy-load="true"
-            binderror="onFoodImgError"
-          ></image>
-          <!-- 图片底部渐变，保证文字可读 -->
-          <view class="food-shade"></view>
-          <!-- 品类标签 -->
-          <view class="food-cat">{{restaurant.category}}</view>
-          <!-- 序号 -->
-          <view class="food-index" wx:if="{{searchedRestaurants.length > 1}}">{{currentIndex + 1}}/{{searchedRestaurants.length}}</view>
-        </view>
 
-        <!-- 店名 + 拨打 -->
-        <view class="head">
-          <text class="name">{{restaurant.name}}</text>
-          <view class="call-btn tap-shrink" wx:if="{{restaurant.tel}}" bindtap="callShop">
-            <view class="call-icon"></view>
+          <!-- 右侧信息 -->
+          <view class="head-info">
+            <view class="head-line">
+              <text class="name">{{restaurant.name}}</text>
+              <view class="call-btn tap-shrink" wx:if="{{restaurant.tel}}" bindtap="callShop">
+                <view class="call-icon"></view>
+              </view>
+            </view>
+            <view class="tags">
+              <view class="tag tag-cat">{{restaurant.category}}</view>
+              <view class="tag tag-primary">{{restaurant.tag}}</view>
+              <view class="tag tag-random">{{restaurant.randomTag}}</view>
+            </view>
           </view>
-        </view>
-
-        <!-- 标签 -->
-        <view class="tags">
-          <view class="tag tag-primary">{{restaurant.tag}}</view>
-          <view class="tag tag-random">{{restaurant.randomTag}}</view>
         </view>
 
         <!-- 数据面板：步行时间 + 直线距离 -->
