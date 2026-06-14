@@ -1,0 +1,209 @@
+/* pages/rank/rank.wxss · 暖食欲橙 */
+.rank-page {
+  min-height: 100vh;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+/* 榜单切换 */
+.rank-tabs {
+  display: flex;
+  gap: 16rpx;
+  padding: 24rpx 32rpx 8rpx;
+}
+.rk-tab {
+  position: relative;
+  padding: 14rpx 28rpx;
+  border-radius: 999rpx;
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--text-2);
+  background: #ecebe8;
+}
+.rk-tab.active {
+  color: #fff;
+  background: linear-gradient(135deg, #ff8a5c, var(--brand-deep));
+  box-shadow: 0 6rpx 16rpx rgba(255, 107, 53, 0.3);
+}
+.rk-tab.disabled {
+  color: var(--text-3);
+  background: #f0efec;
+}
+.rk-soon {
+  font-size: 18rpx;
+  font-weight: 500;
+  margin-left: 6rpx;
+  color: var(--text-3);
+}
+
+.rank-sub {
+  padding: 8rpx 36rpx 16rpx;
+  font-size: 24rpx;
+  color: var(--text-3);
+}
+
+/* 列表 */
+.rank-list {
+  flex: 1;
+  padding: 0 24rpx;
+  box-sizing: border-box;
+}
+.rank-item {
+  display: flex;
+  align-items: center;
+  background: var(--card);
+  border-radius: 24rpx;
+  padding: 24rpx 26rpx;
+  margin-bottom: 18rpx;
+  box-shadow: 0 6rpx 20rpx rgba(31, 31, 34, 0.05);
+}
+
+/* 名次 */
+.rk-no {
+  flex-shrink: 0;
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: 16rpx;
+  text-align: center;
+  line-height: 56rpx;
+  font-size: 30rpx;
+  font-weight: 800;
+  font-style: italic;
+  color: #fff;
+  margin-right: 24rpx;
+  background: #c9c7c2;
+}
+.rk-no-1 { background: linear-gradient(135deg, #ffcf5c, #f5a623); }
+.rk-no-2 { background: linear-gradient(135deg, #cfd3da, #a7adb6); }
+.rk-no-3 { background: linear-gradient(135deg, #f0b48a, #d98b54); }
+.rk-no-rest {
+  background: transparent;
+  color: var(--text-3);
+  font-size: 32rpx;
+}
+
+/* 信息 */
+.rk-info {
+  flex: 1;
+  min-width: 0;
+}
+.rk-name {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: var(--text-1);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.rk-meta {
+  display: flex;
+  align-items: center;
+  margin-top: 8rpx;
+  font-size: 24rpx;
+  color: var(--text-3);
+}
+.rk-cat {
+  color: var(--brand-deep);
+  background: var(--brand-soft);
+  padding: 2rpx 12rpx;
+  border-radius: 8rpx;
+  font-weight: 600;
+}
+.rk-dot { margin: 0 10rpx; }
+
+/* 右侧 */
+.rk-right {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  margin-left: 18rpx;
+}
+.rk-dist {
+  display: flex;
+  align-items: baseline;
+}
+.rk-dist-num {
+  font-size: 36rpx;
+  font-weight: 800;
+  color: var(--text-1);
+}
+.rk-dist-unit {
+  font-size: 22rpx;
+  color: var(--text-3);
+  margin-left: 4rpx;
+}
+.rk-go {
+  margin-top: 10rpx;
+  font-size: 22rpx;
+  font-weight: 600;
+  color: var(--brand);
+  background: var(--brand-soft);
+  border: 1rpx solid var(--brand-line);
+  padding: 4rpx 18rpx;
+  border-radius: 999rpx;
+}
+
+.rank-foot {
+  text-align: center;
+  font-size: 22rpx;
+  color: var(--text-3);
+  padding: 16rpx 0 calc(40rpx + env(safe-area-inset-bottom));
+}
+
+/* 空状态 */
+.rank-empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0 80rpx;
+  text-align: center;
+}
+.bowl {
+  width: 188rpx;
+  height: 100rpx;
+  margin: 0 auto 48rpx;
+  border-radius: 16rpx 16rpx 96rpx 96rpx;
+  position: relative;
+}
+.bowl-empty {
+  background: linear-gradient(180deg, #d8d5d1, #b7b3ad);
+  box-shadow: 0 18rpx 36rpx rgba(31, 31, 34, 0.12);
+}
+.bowl-empty::before {
+  content: '';
+  position: absolute;
+  top: -14rpx;
+  left: -14rpx;
+  right: -14rpx;
+  height: 34rpx;
+  border-radius: 50%;
+  background: #e7e4e0;
+}
+.empty-title {
+  font-size: 34rpx;
+  font-weight: 700;
+  color: var(--text-1);
+}
+.empty-desc {
+  font-size: 26rpx;
+  color: var(--text-2);
+  margin-top: 14rpx;
+}
+.primary-btn {
+  margin-top: 48rpx;
+  width: 420rpx;
+  height: 88rpx;
+  line-height: 88rpx;
+  text-align: center;
+  border-radius: 999rpx;
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #fff;
+  background: linear-gradient(135deg, #ff8a5c, var(--brand-deep));
+  box-shadow: 0 10rpx 24rpx rgba(255, 107, 53, 0.32);
+}

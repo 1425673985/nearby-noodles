@@ -1,0 +1,54 @@
+<!--pages/rank/rank.wxml-->
+<view class="rank-page">
+
+  <!-- 榜单切换 -->
+  <view class="rank-tabs">
+    <view class="rk-tab {{activeTab === 'distance' ? 'active' : ''}}" bindtap="loadDistanceRank">距离榜</view>
+    <view class="rk-tab disabled" bindtap="onTabDisabled">
+      热门榜<text class="rk-soon">待开放</text>
+    </view>
+    <view class="rk-tab disabled" bindtap="onTabDisabled">
+      好评榜<text class="rk-soon">待开放</text>
+    </view>
+  </view>
+
+  <view class="rank-sub" wx:if="{{list.length}}">按由近到远排序 · 共 {{list.length}} 家</view>
+
+  <!-- 列表 -->
+  <scroll-view scroll-y="true" class="rank-list" wx:if="{{list.length}}">
+    <view
+      class="rank-item tap-shrink"
+      wx:for="{{list}}"
+      wx:key="id"
+      data-index="{{index}}"
+      bindtap="navItem"
+    >
+      <view class="rk-no rk-no-{{index < 3 ? index + 1 : 'rest'}}">{{index + 1}}</view>
+
+      <view class="rk-info">
+        <view class="rk-name">{{item.name}}</view>
+        <view class="rk-meta">
+          <text class="rk-cat">{{item.category}}</text>
+          <text class="rk-dot">·</text>
+          <text class="rk-walk">步行约 {{item.walkingTime}} 分钟</text>
+        </view>
+      </view>
+
+      <view class="rk-right">
+        <view class="rk-dist"><text class="rk-dist-num">{{item.distance}}</text><text class="rk-dist-unit">m</text></view>
+        <view class="rk-go">去这家</view>
+      </view>
+    </view>
+
+    <view class="rank-foot">仅按直线距离排序 · 数据来自腾讯地图</view>
+  </scroll-view>
+
+  <!-- 空状态 -->
+  <view class="rank-empty" wx:else>
+    <view class="bowl bowl-empty"></view>
+    <view class="empty-title">还没有附近面馆数据</view>
+    <view class="empty-desc">先回首页定位并搜索一次面馆</view>
+    <button class="primary-btn tap-shrink" bindtap="backHome">回首页找面馆</button>
+  </view>
+
+</view>

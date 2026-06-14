@@ -67,6 +67,12 @@
       bindscalechange="onMapScaleChange"
     ></map>
 
+    <!-- 附近排行入口 -->
+    <view class="rank-entry tap-shrink" bindtap="goRank">
+      <view class="rank-entry-icon"></view>
+      <text class="rank-entry-text">附近榜</text>
+    </view>
+
     <!-- 悬浮底卡 -->
     <view class="sheet">
       <!-- 重新定位（贴在底卡上沿） -->

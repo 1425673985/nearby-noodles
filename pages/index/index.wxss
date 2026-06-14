@@ -17,6 +17,35 @@
   height: 100%;
 }
 
+/* 附近排行入口 */
+.rank-entry {
+  position: absolute;
+  top: 24rpx;
+  left: 24rpx;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  height: 64rpx;
+  padding: 0 24rpx 0 18rpx;
+  border-radius: 999rpx;
+  background: var(--card);
+  box-shadow: 0 6rpx 20rpx rgba(0, 0, 0, 0.16);
+}
+.rank-entry-icon {
+  width: 28rpx;
+  height: 28rpx;
+  margin-right: 10rpx;
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='%23ff6b35'%3E%3Cpath%20d='M19%205h-2V3H7v2H5C3.9%205%203%205.9%203%207v1c0%202.55%201.92%204.63%204.39%204.94.63%201.5%201.98%202.63%203.61%202.91V17H8v2h8v-2h-3v-2.15c1.63-.28%202.98-1.41%203.61-2.91C19.08%2012.63%2021%2010.55%2021%208V7c0-1.1-.9-2-2-2zM5%208V7h2v3.82C5.84%2010.4%205%209.3%205%208zm14%200c0%201.3-.84%202.4-2%202.82V7h2v1z'/%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+.rank-entry-text {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: var(--text-1);
+}
+
 /* ============ 悬浮底卡 ============ */
 .sheet {
   position: absolute;

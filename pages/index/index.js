@@ -172,7 +172,15 @@ Page({
             loading: false,
             error: null
           })
-          
+
+          // 保存完整列表（按距离升序）到全局，供「附近排行」页使用（不额外发请求）
+          const nearbyList = restaurants
+            .map((item) => this.processRestaurantData(item, location))
+            .sort((a, b) => a.distance - b.distance)
+          const app = getApp()
+          app.globalData.nearbyList = nearbyList
+          app.globalData.userLocation = location
+
           // 自动聚焦用户位置和面馆位置（适合步行）
           setTimeout(() => {
             this.focusOnUserAndRestaurant()
@@ -338,6 +346,11 @@ Page({
   // 门脸图加载失败：回退到插画
   onFoodImgError() {
     this.setData({ foodImgError: true })
+  },
+
+  // 跳转附近排行页
+  goRank() {
+    wx.navigateTo({ url: '/pages/rank/rank' })
   },
 
   // 一键拨打面馆电话
