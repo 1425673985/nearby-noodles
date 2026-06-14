@@ -23,7 +23,27 @@ Page({
     showLocationBtn: false, // 是否显示定位用户按钮
     mapContext: null, // 地图上下文
     mapInteractionTimer: null, // 地图交互定时器
-    foodImgError: false // 门脸图加载失败时回退到插画
+    foodImgError: false, // 门脸图加载失败时回退到插画
+    liked: false // 当前面馆是否已点赞
+  },
+
+  // 点赞本地存储 key
+  LIKE_STORE_KEY: 'liked_shops',
+
+  // 读取已点赞集合（{ [id]: 1 }）
+  getLikedMap() {
+    return wx.getStorageSync(this.LIKE_STORE_KEY) || {}
+  },
+
+  // 取面馆唯一标识
+  shopKey(restaurant) {
+    return (restaurant && (restaurant.id || restaurant.name)) || ''
+  },
+
+  // 判断是否已点赞
+  isLiked(restaurant) {
+    const key = this.shopKey(restaurant)
+    return key ? !!this.getLikedMap()[key] : false
   },
 
   onLoad() {
@@ -309,6 +329,7 @@ Page({
       currentIndex: 0,
       restaurant: firstRestaurant,
       foodImgError: false,
+      liked: this.isLiked(firstRestaurant),
       loading: false,
       error: null
     })
@@ -487,6 +508,31 @@ Page({
   // 跳转附近排行页
   goRank() {
     wx.navigateTo({ url: '/pages/rank/rank' })
+  },
+
+  // 点赞 / 取消点赞（本地持久化）
+  toggleLike() {
+    const { restaurant } = this.data
+    const key = this.shopKey(restaurant)
+    if (!key) {
+      return
+    }
+    const map = this.getLikedMap()
+    let liked
+    if (map[key]) {
+      delete map[key]
+      liked = false
+    } else {
+      map[key] = 1
+      liked = true
+    }
+    wx.setStorageSync(this.LIKE_STORE_KEY, map)
+    this.setData({ liked })
+    wx.showToast({
+      title: liked ? '已点赞' : '已取消',
+      icon: liked ? 'success' : 'none',
+      duration: 1000
+    })
   },
 
   // 一键拨打面馆电话
@@ -700,7 +746,8 @@ Page({
     this.setData({
       currentIndex: nextIndex,
       restaurant: nextRestaurant,
-      foodImgError: false
+      foodImgError: false,
+      liked: this.isLiked(nextRestaurant)
     })
 
     // 自动聚焦到新的面馆位置（用户位置+新面馆位置）

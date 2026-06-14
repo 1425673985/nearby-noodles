@@ -17,35 +17,6 @@
   height: 100%;
 }
 
-/* 附近排行入口 */
-.rank-entry {
-  position: absolute;
-  top: 24rpx;
-  left: 24rpx;
-  z-index: 5;
-  display: flex;
-  align-items: center;
-  height: 64rpx;
-  padding: 0 24rpx 0 18rpx;
-  border-radius: 999rpx;
-  background: var(--card);
-  box-shadow: 0 6rpx 20rpx rgba(0, 0, 0, 0.16);
-}
-.rank-entry-icon {
-  width: 28rpx;
-  height: 28rpx;
-  margin-right: 10rpx;
-  background-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='%23ff6b35'%3E%3Cpath%20d='M19%205h-2V3H7v2H5C3.9%205%203%205.9%203%207v1c0%202.55%201.92%204.63%204.39%204.94.63%201.5%201.98%202.63%203.61%202.91V17H8v2h8v-2h-3v-2.15c1.63-.28%202.98-1.41%203.61-2.91C19.08%2012.63%2021%2010.55%2021%208V7c0-1.1-.9-2-2-2zM5%208V7h2v3.82C5.84%2010.4%205%209.3%205%208zm14%200c0%201.3-.84%202.4-2%202.82V7h2v1z'/%3E%3C/svg%3E");
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
-}
-.rank-entry-text {
-  font-size: 26rpx;
-  font-weight: 600;
-  color: var(--text-1);
-}
-
 /* ============ 悬浮底卡 ============ */
 .sheet {
   position: absolute;
@@ -404,60 +375,87 @@
   text-overflow: ellipsis;
 }
 
-/* ============ 操作栏 ============ */
-.action-bar {
+/* ============ 操作栏（四按钮） ============ */
+.toolbar {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  align-items: flex-start;
   margin-top: 24rpx;
+  padding-top: 20rpx;
+  border-top: 1rpx solid var(--line);
 }
-.change-btn {
+.tool {
+  flex: 1;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 10rpx;
-  height: 76rpx;
-  padding: 0 44rpx;
-  border-radius: 999rpx;
-  color: var(--brand);
-  background: var(--brand-soft);
-  border: 2rpx solid var(--brand-line);
-  font-size: 28rpx;
-  font-weight: 600;
 }
-.change-btn.is-disabled {
-  color: var(--text-3);
-  background: #f3f2f0;
-  border-color: #ececec;
-  opacity: 0.75;
-}
-.change-icon {
-  width: 30rpx;
-  height: 30rpx;
-  background-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='%23ff6b35'%3E%3Cpath%20d='M17.65%206.35A7.958%207.958%200%200012%204a8%208%200%20108%208h-2a6%206%200%2011-6-6c1.66%200%203.14.69%204.22%201.78L13%2011h7V4l-2.35%202.35z'/%3E%3C/svg%3E");
-  background-size: contain;
+.tool-ic {
+  width: 84rpx;
+  height: 84rpx;
+  border-radius: 50%;
+  background-color: var(--brand-soft);
+  border: 1rpx solid var(--brand-line);
   background-repeat: no-repeat;
   background-position: center;
+}
+.tool-tx {
+  margin-top: 12rpx;
+  font-size: 24rpx;
+  font-weight: 600;
+  color: var(--text-2);
 }
 
-/* 导航图标按钮（FAB） */
-.nav-fab {
-  flex-shrink: 0;
-  width: 88rpx;
-  height: 88rpx;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #ff8a5c, var(--brand-deep));
-  box-shadow: var(--shadow-btn);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+/* 换一家 */
+.ic-change {
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='%23ff6b35'%3E%3Cpath%20d='M17.65%206.35A7.958%207.958%200%200012%204a8%208%200%20108%208h-2a6%206%200%2011-6-6c1.66%200%203.14.69%204.22%201.78L13%2011h7V4l-2.35%202.35z'/%3E%3C/svg%3E");
+  background-size: 40rpx 40rpx;
 }
-.nav-fab-icon {
-  width: 46rpx;
-  height: 46rpx;
-  background-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='%23ffffff'%3E%3Cpath%20d='M21%203L3%2010.53v.98l6.84%202.65L12.48%2021h.98L21%203z'/%3E%3C/svg%3E");
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
+/* 点赞（默认） */
+.ic-like {
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='%23ff6b35'%3E%3Cpath%20d='M2%2021h4V9H2v12zm20-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L13.17%201%206.59%207.59C6.22%207.95%206%208.45%206%209v10c0%201.1.9%202%202%202h9c.83%200%201.54-.5%201.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-1.91z'/%3E%3C/svg%3E");
+  background-size: 40rpx 40rpx;
+}
+/* 排行 */
+.ic-rank {
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='%23ff6b35'%3E%3Cpath%20d='M19%205h-2V3H7v2H5C3.9%205%203%205.9%203%207v1c0%202.55%201.92%204.63%204.39%204.94.63%201.5%201.98%202.63%203.61%202.91V17H8v2h8v-2h-3v-2.15c1.63-.28%202.98-1.41%203.61-2.91C19.08%2012.63%2021%2010.55%2021%208V7c0-1.1-.9-2-2-2zM5%208V7h2v3.82C5.84%2010.4%205%209.3%205%208zm14%200c0%201.3-.84%202.4-2%202.82V7h2v1z'/%3E%3C/svg%3E");
+  background-size: 42rpx 42rpx;
+}
+/* 排行：更醒目（金色实心） */
+.tool-rank .tool-ic {
+  background-color: #fff6e2;
+  border-color: #ffe1a6;
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='%23f5a623'%3E%3Cpath%20d='M19%205h-2V3H7v2H5C3.9%205%203%205.9%203%207v1c0%202.55%201.92%204.63%204.39%204.94.63%201.5%201.98%202.63%203.61%202.91V17H8v2h8v-2h-3v-2.15c1.63-.28%202.98-1.41%203.61-2.91C19.08%2012.63%2021%2010.55%2021%208V7c0-1.1-.9-2-2-2zM5%208V7h2v3.82C5.84%2010.4%205%209.3%205%208zm14%200c0%201.3-.84%202.4-2%202.82V7h2v1z'/%3E%3C/svg%3E");
+  background-size: 42rpx 42rpx;
+}
+.tool-rank .tool-tx {
+  color: #c8861a;
+}
+/* 导航（主操作：实心橙圆） */
+.tool-nav .tool-ic {
+  border-color: transparent;
+  box-shadow: var(--shadow-btn);
+  background-color: transparent;
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='%23ffffff'%3E%3Cpath%20d='M21%203L3%2010.53v.98l6.84%202.65L12.48%2021h.98L21%203z'/%3E%3C/svg%3E"), linear-gradient(135deg, #ff8a5c, var(--brand-deep));
+  background-size: 44rpx 44rpx, cover;
+  background-position: center, center;
+}
+.tool-nav .tool-tx {
+  color: var(--brand);
+}
+/* 已点赞（实心红） */
+.tool.is-liked .tool-ic {
+  border-color: transparent;
+  background-color: transparent;
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='%23ffffff'%3E%3Cpath%20d='M2%2021h4V9H2v12zm20-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L13.17%201%206.59%207.59C6.22%207.95%206%208.45%206%209v10c0%201.1.9%202%202%202h9c.83%200%201.54-.5%201.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-1.91z'/%3E%3C/svg%3E"), linear-gradient(135deg, #ff7a5c, #ef4d4d);
+  background-size: 40rpx 40rpx, cover;
+  background-position: center, center;
+}
+.tool.is-liked .tool-tx {
+  color: #ef4d4d;
+}
+/* 换一家不可用 */
+.tool.is-disabled {
+  opacity: 0.4;
 }
 
 /* ============ 状态页（授权 / 错误） ============ */

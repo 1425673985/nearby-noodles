@@ -67,12 +67,6 @@
       bindscalechange="onMapScaleChange"
     ></map>
 
-    <!-- 附近排行入口 -->
-    <view class="rank-entry tap-shrink" bindtap="goRank">
-      <view class="rank-entry-icon"></view>
-      <text class="rank-entry-text">附近榜</text>
-    </view>
-
     <!-- 悬浮底卡 -->
     <view class="sheet">
       <!-- 重新定位（贴在底卡上沿） -->
@@ -143,15 +137,23 @@
         </view>
       </view>
 
-      <!-- 操作栏 -->
-      <view class="action-bar">
-        <view class="change-btn tap-shrink {{searchedRestaurants.length <= 1 ? 'is-disabled' : ''}}" bindtap="changeRestaurant">
-          <view class="change-icon"></view>
-          <text>换一家</text>
+      <!-- 操作栏：换一家 / 点赞 / 排行 / 导航 -->
+      <view class="toolbar">
+        <view class="tool tap-shrink {{searchedRestaurants.length <= 1 ? 'is-disabled' : ''}}" bindtap="changeRestaurant">
+          <view class="tool-ic ic-change"></view>
+          <text class="tool-tx">换一家</text>
         </view>
-        <!-- 导航图标按钮 -->
-        <view class="nav-fab tap-shrink" bindtap="openNavigation">
-          <view class="nav-fab-icon"></view>
+        <view class="tool tap-shrink {{liked ? 'is-liked' : ''}}" bindtap="toggleLike">
+          <view class="tool-ic ic-like"></view>
+          <text class="tool-tx">{{liked ? '已赞' : '点赞'}}</text>
+        </view>
+        <view class="tool tool-rank tap-shrink" bindtap="goRank">
+          <view class="tool-ic ic-rank"></view>
+          <text class="tool-tx">排行</text>
+        </view>
+        <view class="tool tool-nav tap-shrink" bindtap="openNavigation">
+          <view class="tool-ic ic-nav"></view>
+          <text class="tool-tx">导航</text>
         </view>
       </view>
     </view>
