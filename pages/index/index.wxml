@@ -162,9 +162,10 @@
         <button class="act act-ghost tap-shrink" bindtap="changeRestaurant" disabled="{{searchedRestaurants.length <= 1}}">
           换一家
         </button>
-        <button class="act act-primary tap-shrink" bindtap="openNavigation">
-          去这家
-        </button>
+        <!-- 导航图标按钮 -->
+        <view class="nav-fab tap-shrink" bindtap="openNavigation">
+          <view class="nav-fab-icon"></view>
+        </view>
       </view>
     </view>
   </block>

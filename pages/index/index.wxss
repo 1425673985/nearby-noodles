@@ -421,13 +421,14 @@
 /* ============ 操作栏 ============ */
 .action-bar {
   display: flex;
+  align-items: center;
   gap: 22rpx;
   margin-top: 20rpx;
 }
 .act {
   flex: 1;
-  height: 86rpx;
-  line-height: 86rpx;
+  height: 88rpx;
+  line-height: 88rpx;
   text-align: center;
   border-radius: 999rpx;
   font-size: 32rpx;
@@ -443,10 +444,26 @@
   background: #f3f2f0;
   border-color: #ececec;
 }
-.act-primary {
-  color: #fff;
+
+/* 导航图标按钮（FAB） */
+.nav-fab {
+  flex-shrink: 0;
+  width: 88rpx;
+  height: 88rpx;
+  border-radius: 50%;
   background: linear-gradient(135deg, #ff8a5c, var(--brand-deep));
   box-shadow: var(--shadow-btn);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.nav-fab-icon {
+  width: 46rpx;
+  height: 46rpx;
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='%23ffffff'%3E%3Cpath%20d='M21%203L3%2010.53v.98l6.84%202.65L12.48%2021h.98L21%203z'/%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
 }
 
 /* ============ 状态页（授权 / 错误） ============ */
