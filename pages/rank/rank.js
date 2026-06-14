@@ -65,7 +65,9 @@ Page({
       return
     }
     const app = getApp()
-    app.globalData.pendingShop = item
+    // 带上推荐理由：好评榜=高分，距离榜=最近
+    const highlight = this.data.activeTab === 'rating' ? 'rating' : 'distance'
+    app.globalData.pendingShop = Object.assign({}, item, { highlight })
     wx.navigateBack({
       fail: () => {
         wx.reLaunch({ url: '/pages/index/index' })

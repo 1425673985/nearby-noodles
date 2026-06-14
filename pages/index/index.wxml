@@ -87,8 +87,8 @@
 
         <!-- 左图 + 右信息 -->
         <view class="info-card">
-          <!-- 左：门店图 -->
-          <view class="photo">
+          <!-- 左：门店图（点击放大） -->
+          <view class="photo" bindtap="previewPhoto">
             <view class="food-illus">
               <view class="illus-bowl">
                 <view class="illus-noodle"></view>
@@ -104,14 +104,19 @@
               lazy-load="true"
               binderror="onFoodImgError"
             ></image>
-            <view class="photo-index" wx:if="{{searchedRestaurants.length > 1}}">{{currentIndex + 1}}/{{searchedRestaurants.length}}</view>
+            <!-- 推荐理由角标 -->
+            <view class="photo-badge {{restaurant.highlight === 'rating' ? 'is-rating' : 'is-distance'}}" wx:if="{{restaurant.highlight}}">
+              {{restaurant.highlight === 'rating' ? '高分推荐' : '离你最近'}}
+            </view>
             <view class="photo-open {{restaurant.openClosed ? 'is-closed' : ''}}" wx:if="{{restaurant.openText}}">{{restaurant.openText}}</view>
+            <!-- 点击放大提示 -->
+            <view class="photo-zoom" wx:if="{{!foodImgError}}"></view>
           </view>
 
           <!-- 右：精简信息 -->
           <view class="info">
             <view class="info-line">
-              <text class="i-rating" wx:if="{{restaurant.rating}}">★ {{restaurant.rating}}</text>
+              <text class="i-rating {{restaurant.highlight === 'rating' ? 'hl' : ''}}" wx:if="{{restaurant.rating}}">★ {{restaurant.rating}}</text>
               <view class="i-sign" wx:if="{{restaurant.signature.length}}">
                 <view class="like-icon"></view>
                 <text>{{restaurant.signature[0]}}</text>
@@ -119,7 +124,7 @@
               <text class="i-cost" wx:if="{{restaurant.cost}}">¥{{restaurant.cost}}/人</text>
             </view>
 
-            <view class="walk-big">
+            <view class="walk-big {{restaurant.highlight === 'distance' ? 'hl' : ''}}">
               <view class="walk-icon"></view>
               <text class="walk-label">步行约</text>
               <text class="walk-num">{{restaurant.walkingTime}}</text>
@@ -139,7 +144,7 @@
 
       <!-- 操作栏：换一家 / 点赞 / 排行 / 导航 -->
       <view class="toolbar">
-        <view class="tool tap-shrink {{searchedRestaurants.length <= 1 ? 'is-disabled' : ''}}" bindtap="changeRestaurant">
+        <view class="tool tap-shrink {{candidates.length <= 1 ? 'is-disabled' : ''}}" bindtap="changeRestaurant">
           <view class="tool-ic ic-change"></view>
           <text class="tool-tx">换一家</text>
         </view>

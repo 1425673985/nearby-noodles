@@ -24,7 +24,32 @@ Page({
     mapContext: null, // 地图上下文
     mapInteractionTimer: null, // 地图交互定时器
     foodImgError: false, // 门脸图加载失败时回退到插画
-    liked: false // 当前面馆是否已点赞
+    liked: false, // 当前面馆是否已点赞
+    candidates: [] // 「换一家」候选池（最近3 + 高分3）
+  },
+
+  // 构建候选池：最近 3 家(highlight=distance) + 高分 3 家(highlight=rating)，去重最多 6 家
+  buildCandidates(list) {
+    const near = list
+      .slice()
+      .sort((a, b) => a.distance - b.distance)
+      .slice(0, 3)
+      .map((r) => Object.assign({}, r, { highlight: 'distance' }))
+    const rated = list
+      .filter((r) => r.ratingNum > 0)
+      .sort((a, b) => b.ratingNum - a.ratingNum)
+      .slice(0, 3)
+      .map((r) => Object.assign({}, r, { highlight: 'rating' }))
+    const pool = []
+    const seen = {}
+    near.concat(rated).forEach((r) => {
+      const k = this.shopKey(r)
+      if (k && !seen[k]) {
+        seen[k] = 1
+        pool.push(r)
+      }
+    })
+    return pool
   },
 
   // 点赞本地存储 key
@@ -76,15 +101,17 @@ Page({
     }
     app.globalData.pendingShop = null
 
-    // 组装「换一家」候选：选中的 + 最近的另一家
+    // 重建候选池，并确保选中的这家在池内、作为当前展示
     const list = (app.globalData.nearbyList || [])
-    const others = list.filter((it) => this.shopKey(it) !== this.shopKey(shop))
-    const searched = others[0] ? [shop, others[0]] : [shop]
+    let candidates = this.buildCandidates(list)
+    const key = this.shopKey(shop)
+    if (!candidates.some((c) => this.shopKey(c) === key)) {
+      candidates = [shop].concat(candidates).slice(0, 6)
+    }
 
     this.setData({
       restaurant: shop,
-      searchedRestaurants: searched,
-      currentIndex: 0,
+      candidates: candidates,
       foodImgError: false,
       liked: this.isLiked(shop),
       loading: false,
@@ -351,13 +378,12 @@ Page({
       .map((item) => this.processRestaurantData(item, location))
       .sort((a, b) => a.distance - b.distance)
 
-    // 首页展示最近的 2 家，支持「换一家」
-    const displayRestaurants = fullList.slice(0, 2)
-    const firstRestaurant = displayRestaurants[0]
+    // 构建「换一家」候选池：最近 3 家 + 高分 3 家（去重，最多 6 家）
+    const candidates = this.buildCandidates(fullList)
+    const firstRestaurant = candidates[0]
 
     this.setData({
-      searchedRestaurants: displayRestaurants,
-      currentIndex: 0,
+      candidates: candidates,
       restaurant: firstRestaurant,
       foodImgError: false,
       liked: this.isLiked(firstRestaurant),
@@ -761,30 +787,38 @@ Page({
     return Math.ceil(timeInMinutes)
   },
 
-  // 换一家面馆（最多2家，在0和1之间切换）
+  // 换一家面馆（从候选池随机切换，排除当前家）
   changeRestaurant() {
-    const { searchedRestaurants, currentIndex } = this.data
+    const { candidates, restaurant } = this.data
 
-    // 如果只有1家，点击无变化
-    if (searchedRestaurants.length <= 1) {
+    if (!candidates || candidates.length <= 1) {
       return
     }
 
-    // searchedRestaurants 已是处理好的数据，直接切换即可
-    const nextIndex = currentIndex === 0 ? 1 : 0
-    const nextRestaurant = searchedRestaurants[nextIndex]
+    const curKey = this.shopKey(restaurant)
+    const pool = candidates.filter((c) => this.shopKey(c) !== curKey)
+    const next = pool[Math.floor(Math.random() * pool.length)]
 
     this.setData({
-      currentIndex: nextIndex,
-      restaurant: nextRestaurant,
+      restaurant: next,
       foodImgError: false,
-      liked: this.isLiked(nextRestaurant)
+      liked: this.isLiked(next)
     })
 
     // 自动聚焦到新的面馆位置（用户位置+新面馆位置）
     setTimeout(() => {
       this.focusOnUserAndRestaurant()
     }, 100)
+  },
+
+  // 点击店面图：全屏预览实景图
+  previewPhoto() {
+    const url = this.data.restaurant && this.data.restaurant.foodImage
+    if (url && url.indexOf('http') === 0) {
+      wx.previewImage({ urls: [url], current: url })
+    } else {
+      wx.showToast({ title: '暂无实景图', icon: 'none' })
+    }
   },
 
   // 打开导航

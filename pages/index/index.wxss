@@ -123,17 +123,35 @@
   height: 100%;
   z-index: 2;
 }
-.photo-index {
+/* 推荐理由角标 */
+.photo-badge {
   position: absolute;
-  right: 10rpx;
+  left: 10rpx;
   top: 10rpx;
   z-index: 4;
   font-size: 20rpx;
-  font-weight: 600;
+  font-weight: 700;
   color: #fff;
-  background: rgba(0, 0, 0, 0.36);
-  padding: 2rpx 12rpx;
+  padding: 4rpx 14rpx;
   border-radius: 999rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.25);
+}
+.photo-badge.is-rating {
+  background: linear-gradient(135deg, #ffc24d, #f5a623);
+}
+.photo-badge.is-distance {
+  background: linear-gradient(135deg, #ff8a5c, #f4511e);
+}
+/* 点击放大提示（右下角放大镜） */
+.photo-zoom {
+  position: absolute;
+  right: 10rpx;
+  bottom: 10rpx;
+  z-index: 4;
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.4) url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='%23ffffff'%3E%3Cpath%20d='M15.5%2014h-.79l-.28-.27a6.5%206.5%200%201%200-.7.7l.27.28v.79l5%204.99L20.49%2019l-4.99-5zm-6%200A4.5%204.5%200%201%201%2014%209.5%204.49%204.49%200%200%201%209.5%2014z'/%3E%3C/svg%3E") center/24rpx no-repeat;
 }
 .photo-open {
   position: absolute;
@@ -227,6 +245,13 @@
   color: #f5a623;
   font-weight: 700;
 }
+/* 高分推荐时高亮评分 */
+.i-rating.hl {
+  color: #fff;
+  background: linear-gradient(135deg, #ffc24d, #f5a623);
+  padding: 2rpx 14rpx;
+  border-radius: 999rpx;
+}
 .i-sign {
   display: flex;
   align-items: center;
@@ -273,6 +298,15 @@
   display: flex;
   align-items: center;
   margin-top: 20rpx;
+}
+/* 离你最近时高亮步行 */
+.walk-big.hl {
+  display: inline-flex;
+  background: #fff3ec;
+  border: 1rpx solid var(--brand-line);
+  border-radius: 16rpx;
+  padding: 6rpx 16rpx 6rpx 12rpx;
+  margin-top: 16rpx;
 }
 .walk-big .walk-icon {
   margin-right: 12rpx;
