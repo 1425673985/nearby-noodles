@@ -20,6 +20,7 @@ Page({
     mapLongitude: 0, // 地图中心经度
     mapLatitude: 0, // 地图中心纬度
     mapScale: 16, // 地图缩放级别
+    polyline: [], // 「我→店」步行连线
     showLocationBtn: false, // 是否显示定位用户按钮
     mapContext: null, // 地图上下文
     mapInteractionTimer: null, // 地图交互定时器
@@ -457,31 +458,30 @@ Page({
     // 处理地址信息
     const address = restaurant.address || restaurant.ad_info?.adname || '地址未知'
 
-      // 生成地图标记点数据
-        // marker id 必须是数字类型，使用固定ID确保替换而不是新增
-        const markerId = 1 // 使用固定的ID，确保每次切换时替换标记而不是新增
-        
-        const mapMarkers = [{
-          id: markerId,
-          latitude: lat,
-          longitude: lng,
-          iconPath: '', // 使用默认标记图标
-          width: 30,
-          height: 30,
-          title: name,
-          callout: {
-            content: name,
-            color: '#333',
-            fontSize: 14,
-            borderRadius: 4,
-            bgColor: '#fff',
-            padding: 8,
-            display: 'ALWAYS'
-          }
-        }]
-
     // 计算步行时间
     const walkingTime = this.calculateWalkingTime(Math.round(distance))
+
+    // 生成地图标记点数据：气泡只显示「步行X分钟」，简短不裁切
+    const markerId = 1 // 使用固定的ID，确保每次切换时替换标记而不是新增
+    const mapMarkers = [{
+      id: markerId,
+      latitude: lat,
+      longitude: lng,
+      iconPath: '', // 使用默认标记图标
+      width: 32,
+      height: 32,
+      title: name,
+      callout: {
+        content: `步行${walkingTime}分钟`,
+        color: '#ff6b35',
+        fontSize: 13,
+        borderRadius: 10,
+        bgColor: '#ffffff',
+        padding: 8,
+        textAlign: 'center',
+        display: 'ALWAYS'
+      }
+    }]
 
     // 识别面食品类（用于食欲配图 + 品类标签）
     const food = this.resolveFood(name, restaurant.category)
@@ -706,11 +706,26 @@ Page({
       restaurant.location.lat
     )
 
+    // 「我 → 店」步行连线（带箭头、虚线），让方向一目了然
+    const polyline = [{
+      points: [
+        { latitude: userLocation.latitude, longitude: userLocation.longitude },
+        { latitude: restaurant.location.lat, longitude: restaurant.location.lng }
+      ],
+      color: '#FF6B35DD',
+      width: 5,
+      dottedLine: true,
+      arrowLine: true,
+      borderColor: '#FFFFFF99',
+      borderWidth: 1
+    }]
+
     // 更新地图中心和缩放级别
     this.setData({
       mapLongitude: bounds.centerLng,
       mapLatitude: bounds.centerLat,
       mapScale: bounds.scale,
+      polyline: polyline,
       showLocationBtn: false // 自动聚焦时隐藏按钮
     })
 
@@ -718,9 +733,9 @@ Page({
     if (!this.mapContext) {
       this.mapContext = wx.createMapContext('restaurantMap', this)
     }
-    
+
     if (this.mapContext) {
-      // 使用includePoints确保两个点都在视野内
+      // 使用includePoints确保两个点都在视野内（四周留足空间，避免标记/标签被裁切或被底卡遮挡）
       this.mapContext.includePoints({
         points: [
           {
@@ -732,7 +747,7 @@ Page({
             latitude: restaurant.location.lat
           }
         ],
-        padding: [80, 50, 300, 50], // 上/右/下/左：底部留足空间，避免标记被悬浮底卡遮挡
+        padding: [110, 90, 330, 70], // 上/右/下/左
         fail: (err) => {
           console.warn('地图自动聚焦失败，使用setData方式', err)
         }

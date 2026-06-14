@@ -54,6 +54,7 @@
       latitude="{{mapLatitude}}"
       scale="{{mapScale}}"
       markers="{{restaurant.mapMarkers}}"
+      polyline="{{polyline}}"
       show-location="true"
       enable-zoom="true"
       enable-scroll="true"
