@@ -1,10 +1,57 @@
-/**app.wxss**/
-.container {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
-  padding: 200rpx 0;
+/**app.wxss — 全局设计系统**/
+
+/* 设计令牌（暖橙食欲风） */
+page {
+  /* 主色 */
+  --brand: #FF6B35;
+  --brand-deep: #E8552D;
+  --brand-soft: #FFF1EB;
+  /* 辅助强调（随机推荐标签等） */
+  --accent: #FF9F1C;
+  --accent-soft: #FFF7E6;
+  /* 中性色 */
+  --bg: #F6F7F9;
+  --surface: #FFFFFF;
+  --text-strong: #1F2329;
+  --text: #3D424A;
+  --text-weak: #8A9099;
+  --text-faint: #B6BBC2;
+  --line: #EEF0F2;
+  /* 圆角与阴影 */
+  --radius-lg: 28rpx;
+  --radius-md: 20rpx;
+  --radius-sm: 12rpx;
+  --shadow-card: 0 8rpx 32rpx rgba(31, 35, 41, 0.08);
+  --shadow-float: 0 6rpx 20rpx rgba(31, 35, 41, 0.12);
+
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 基础重置 */
+view, text, button {
   box-sizing: border-box;
+}
+
+/* 去除原生 button 的边框与默认样式 */
+button {
+  padding: 0;
+  margin: 0;
+  font-size: inherit;
+  line-height: normal;
+  background: transparent;
+}
+button::after {
+  border: none;
+}
+
+/* 通用按压反馈 */
+.press {
+  transition: transform 0.12s ease, opacity 0.12s ease;
+}
+.press:active {
+  transform: scale(0.97);
+  opacity: 0.9;
 }

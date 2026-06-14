@@ -16,6 +16,9 @@ Page({
     userLocation: null,
     searchedRestaurants: [], // 已搜索到的面馆列表
     currentIndex: 0, // 当前显示的面馆索引
+    totalCount: 0, // 找到的面馆总数
+    indexLabel: '', // 当前序号文案，如「第 1 家」
+    cardEnter: false, // 卡片入场动画开关
     mapLongitude: 0, // 地图中心经度
     mapLatitude: 0, // 地图中心纬度
     mapScale: 16, // 地图缩放级别
@@ -145,39 +148,29 @@ Page({
       radius: config.SEARCH_RADIUS,
       success: (res) => {
         const restaurants = res.data || []
-        // 调试：打印返回的完整数据结构，查看是否有图片字段
-        if (restaurants.length > 0) {
-          console.log('========== 腾讯地图API返回的完整数据结构 ==========')
-          console.log('第一条数据：', JSON.stringify(restaurants[0], null, 2))
-          console.log('所有字段列表：', Object.keys(restaurants[0]))
-          console.log('是否有photo字段：', restaurants[0].photo)
-          console.log('是否有photos字段：', restaurants[0].photos)
-          console.log('是否有image_url字段：', restaurants[0].image_url)
-          console.log('是否有pic_url字段：', restaurants[0].pic_url)
-          console.log('是否有category字段：', restaurants[0].category)
-          console.log('是否有image字段：', restaurants[0].image)
-          console.log('==========================================')
-        }
         if (restaurants.length > 0) {
           // 限制最多只显示2家
           const displayRestaurants = restaurants.slice(0, 2)
-          
+
           // 处理第一个面馆的数据
           const firstRestaurant = this.processRestaurantData(displayRestaurants[0], location)
-          
+
           // 根据距离选择推荐标签
           firstRestaurant.tag = this.getRecommendTag(firstRestaurant.distance)
           // 生成随机推荐标签
           firstRestaurant.randomTag = this.getRandomRecommendTag()
-          
+
           this.setData({
             searchedRestaurants: displayRestaurants,
             currentIndex: 0,
-            restaurant: firstRestaurant,
+            totalCount: displayRestaurants.length,
+            indexLabel: this.buildIndexLabel(0, displayRestaurants.length),
             loading: false,
             error: null
           })
-          
+          // 带入场动画地渲染卡片
+          this.applyRestaurant(firstRestaurant)
+
           // 自动聚焦用户位置和面馆位置（适合步行）
           setTimeout(() => {
             this.focusOnUserAndRestaurant()
@@ -286,9 +279,7 @@ Page({
   },
 
   // 地图点击事件
-  onMapTap(e) {
-    console.log('地图被点击', e)
-  },
+  onMapTap() {},
 
   // 地图拖动开始
   onMapRegionChange(e) {
@@ -416,13 +407,7 @@ Page({
             latitude: restaurant.location.lat
           }
         ],
-        padding: [60, 60, 60, 60], // 上下左右边距
-        success: () => {
-          console.log('地图自动聚焦成功')
-        },
-        fail: (err) => {
-          console.warn('地图自动聚焦失败，使用setData方式', err)
-        }
+        padding: [60, 60, 60, 60] // 上下左右边距
       })
     }
   },
@@ -510,14 +495,34 @@ Page({
     return Math.ceil(timeInMinutes)
   },
 
+  // 渲染面馆并触发卡片入场动画
+  applyRestaurant(restaurant) {
+    // 先移除动画类，再在下一帧加上，确保动画每次都能重新触发
+    this.setData({ restaurant, cardEnter: false })
+    setTimeout(() => {
+      this.setData({ cardEnter: true })
+    }, 30)
+  },
+
+  // 构造当前序号文案
+  buildIndexLabel(index, total) {
+    if (total <= 1) {
+      return '附近只有这一家'
+    }
+    return `第 ${index + 1} / ${total} 家`
+  },
+
   // 换一家面馆（最多2家，在0和1之间切换）
   changeRestaurant() {
     const { searchedRestaurants, currentIndex, userLocation } = this.data
-    
+
     // 如果只有1家，点击无变化
     if (searchedRestaurants.length <= 1) {
       return
     }
+
+    // 轻微震动反馈，强化「帮我选」的爽感
+    wx.vibrateShort({ type: 'light' })
 
     // 如果有2家，在0和1之间来回切换
     const nextIndex = currentIndex === 0 ? 1 : 0
@@ -533,9 +538,11 @@ Page({
 
     this.setData({
       currentIndex: nextIndex,
-      restaurant: nextRestaurant
+      indexLabel: this.buildIndexLabel(nextIndex, searchedRestaurants.length)
     })
-    
+    // 带入场动画地渲染新卡片
+    this.applyRestaurant(nextRestaurant)
+
     // 自动聚焦到新的面馆位置（用户位置+新面馆位置）
     setTimeout(() => {
       this.focusOnUserAndRestaurant()
@@ -561,11 +568,7 @@ Page({
       name: restaurant.name,
       address: restaurant.address,
       scale: 18,
-      success: () => {
-        console.log('打开导航成功')
-      },
-      fail: (err) => {
-        console.error('打开导航失败', err)
+      fail: () => {
         wx.showToast({
           title: '打开导航失败',
           icon: 'none'

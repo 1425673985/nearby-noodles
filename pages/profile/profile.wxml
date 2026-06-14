@@ -1,15 +1,55 @@
 <!--pages/profile/profile.wxml-->
-<view class="container">
-  <view class="profile-content">
-    <!-- 个人信息内容区域 -->
-    <view class="info-section">
-      <text class="info-text">个人信息页面</text>
+<view class="page">
+
+  <!-- 品牌头部 -->
+  <view class="brand">
+    <view class="brand__logo">🍜</view>
+    <view class="brand__name">附近面馆</view>
+    <view class="brand__slogan">选择困难？帮你挑一家不踩雷的面</view>
+  </view>
+
+  <!-- 功能介绍 -->
+  <view class="panel">
+    <view class="panel__title">它能帮你做什么</view>
+    <view class="feature">
+      <view class="feature__icon">📍</view>
+      <view class="feature__body">
+        <view class="feature__name">就近搜面</view>
+        <view class="feature__desc">自动定位，找出 3 公里内的面馆</view>
+      </view>
+    </view>
+    <view class="feature">
+      <view class="feature__icon">🎲</view>
+      <view class="feature__body">
+        <view class="feature__name">帮你做决定</view>
+        <view class="feature__desc">不知道吃哪家？「换一家」一键随机</view>
+      </view>
+    </view>
+    <view class="feature">
+      <view class="feature__icon">🚶</view>
+      <view class="feature__body">
+        <view class="feature__name">步行可达</view>
+        <view class="feature__desc">显示距离和步行时间，心里有数</view>
+      </view>
+    </view>
+    <view class="feature feature--last">
+      <view class="feature__icon">🧭</view>
+      <view class="feature__body">
+        <view class="feature__name">一键导航</view>
+        <view class="feature__desc">选好就走，直接唤起地图导航</view>
+      </view>
     </view>
   </view>
 
-  <!-- 版本号显示 -->
-  <view class="version-container">
-    <text class="version-text">{{versionDisplay}}</text>
+  <!-- 使用小贴士 -->
+  <view class="panel">
+    <view class="panel__title">使用小贴士</view>
+    <view class="tip">首次使用请允许「位置」授权，否则无法查找附近面馆。</view>
+    <view class="tip">若提示附近没有面馆，可换个位置或稍后重试。</view>
+    <view class="tip tip--last">位置信息仅用于本地查找，不会上传或保存。</view>
   </view>
-</view>
 
+  <!-- 版本号 -->
+  <view class="version">{{versionDisplay}}</view>
+
+</view>

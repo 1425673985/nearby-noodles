@@ -4,10 +4,27 @@
     "pages/profile/profile"
   ],
   "window": {
-    "backgroundTextStyle": "light",
-    "navigationBarBackgroundColor": "#fff",
+    "backgroundColor": "#F6F7F9",
+    "backgroundTextStyle": "dark",
+    "navigationBarBackgroundColor": "#FF6B35",
     "navigationBarTitleText": "附近面馆",
-    "navigationBarTextStyle": "black"
+    "navigationBarTextStyle": "white"
+  },
+  "tabBar": {
+    "color": "#8A9099",
+    "selectedColor": "#FF6B35",
+    "backgroundColor": "#FFFFFF",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "附近"
+      },
+      {
+        "pagePath": "pages/profile/profile",
+        "text": "我的"
+      }
+    ]
   },
   "permission": {
     "scope.userLocation": {
