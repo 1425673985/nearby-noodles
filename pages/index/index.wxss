@@ -114,15 +114,32 @@
   padding-top: 8rpx;
 }
 
-/* —— 紧凑头部：左图右文 —— */
-.head-card {
+/* 店名 */
+.name-row {
   display: flex;
   align-items: center;
+  justify-content: space-between;
 }
-.thumb {
+.shop-name {
+  font-size: 38rpx;
+  font-weight: 700;
+  color: var(--text-1);
+  flex: 1;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* —— 左图 + 右信息 —— */
+.info-card {
+  display: flex;
+  align-items: stretch;
+  margin-top: 18rpx;
+}
+.photo {
   position: relative;
-  width: 132rpx;
-  height: 132rpx;
+  width: 248rpx;
+  height: 196rpx;
   border-radius: 20rpx;
   overflow: hidden;
   flex-shrink: 0;
@@ -135,22 +152,33 @@
   height: 100%;
   z-index: 2;
 }
-.thumb-index {
+.photo-index {
   position: absolute;
-  right: 8rpx;
-  top: 8rpx;
+  right: 10rpx;
+  top: 10rpx;
   z-index: 4;
   font-size: 20rpx;
   font-weight: 600;
   color: #fff;
-  background: rgba(0, 0, 0, 0.34);
+  background: rgba(0, 0, 0, 0.36);
   padding: 2rpx 12rpx;
   border-radius: 999rpx;
 }
-.head-info {
-  flex: 1;
-  margin-left: 22rpx;
-  min-width: 0;
+.photo-open {
+  position: absolute;
+  left: 10rpx;
+  bottom: 10rpx;
+  z-index: 4;
+  font-size: 20rpx;
+  font-weight: 700;
+  color: #fff;
+  background: #1faa53;
+  padding: 4rpx 14rpx;
+  border-radius: 999rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.2);
+}
+.photo-open.is-closed {
+  background: rgba(60, 60, 64, 0.85);
 }
 
 /* 兜底插画：一碗冒热气的面（缩略图版） */
@@ -164,29 +192,29 @@
 }
 .illus-bowl {
   position: relative;
-  width: 88rpx;
-  height: 46rpx;
+  width: 150rpx;
+  height: 80rpx;
   background: #fff;
-  border-radius: 8rpx 8rpx 48rpx 48rpx;
-  box-shadow: 0 6rpx 16rpx rgba(0, 0, 0, 0.12);
+  border-radius: 12rpx 12rpx 80rpx 80rpx;
+  box-shadow: 0 10rpx 24rpx rgba(0, 0, 0, 0.14);
 }
 .illus-bowl::before {
   content: '';
   position: absolute;
-  top: -7rpx;
-  left: -8rpx;
-  right: -8rpx;
-  height: 16rpx;
+  top: -10rpx;
+  left: -12rpx;
+  right: -12rpx;
+  height: 26rpx;
   border-radius: 50%;
   background: #fff;
 }
 .illus-noodle {
   position: absolute;
-  top: -1rpx;
+  top: -2rpx;
   left: 50%;
   transform: translateX(-50%);
-  width: 58rpx;
-  height: 12rpx;
+  width: 96rpx;
+  height: 18rpx;
   border-radius: 50%;
   background: #ffd9a0;
   z-index: 2;
@@ -194,34 +222,57 @@
 .illus-steam,
 .illus-steam.s2 {
   position: absolute;
-  top: -28rpx;
-  left: 32rpx;
-  width: 5rpx;
-  height: 24rpx;
+  top: -46rpx;
+  left: 54rpx;
+  width: 7rpx;
+  height: 38rpx;
   border-radius: 8rpx;
   background: rgba(255, 255, 255, 0.7);
   animation: steam 2.4s ease-in-out infinite;
   z-index: 2;
 }
 .illus-steam.s2 {
-  left: 52rpx;
+  left: 90rpx;
   animation-delay: 0.7s;
 }
 
-.head-line {
+/* 右侧信息列 */
+.info {
+  flex: 1;
+  margin-left: 24rpx;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.info-line {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8rpx 18rpx;
+  font-size: 24rpx;
 }
-.name {
-  font-size: 38rpx;
+.i-rating {
+  color: #f5a623;
   font-weight: 700;
-  color: var(--text-1);
-  letter-spacing: 0.5rpx;
-  flex: 1;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+}
+.i-sign {
+  display: flex;
+  align-items: center;
+  gap: 6rpx;
+  color: var(--brand-deep);
+  font-weight: 600;
+}
+.like-icon {
+  width: 26rpx;
+  height: 26rpx;
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='%23f4511e'%3E%3Cpath%20d='M2%2021h4V9H2v12zm20-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L13.17%201%206.59%207.59C6.22%207.95%206%208.45%206%209v10c0%201.1.9%202%202%202h9c.83%200%201.54-.5%201.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-1.91z'/%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+.i-cost {
+  color: var(--text-2);
 }
 
 /* 拨打按钮 */
@@ -246,110 +297,38 @@
   background-position: center;
 }
 
-/* 标签 */
-.tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12rpx;
-  margin-top: 12rpx;
-}
-.tag {
-  font-size: 22rpx;
-  font-weight: 600;
-  padding: 6rpx 16rpx;
-  border-radius: 999rpx;
-  line-height: 1.4;
-}
-.tag-cat {
-  color: #fff;
-  background: rgba(31, 31, 34, 0.82);
-}
-/* 真实招牌菜 */
-.tag-sign {
-  color: var(--brand-deep);
-  background: var(--brand-soft);
-  border: 1rpx solid var(--brand-line);
-}
-/* 营业状态 */
-.tag-open {
-  color: #1a8a4a;
-  background: #e8f7ee;
-  border: 1rpx solid #bfe8cf;
-}
-.tag-open.tag-closed {
-  color: #8a8a8f;
-  background: #f1f0ee;
-  border-color: #e3e1dd;
-}
-
-/* 评分 / 人均 */
-.meta {
+/* 步行（醒目） */
+.walk-big {
   display: flex;
   align-items: center;
-  margin-top: 12rpx;
-  font-size: 24rpx;
+  margin-top: 20rpx;
 }
-.meta-rating {
-  color: #f5a623;
-  font-weight: 700;
+.walk-big .walk-icon {
+  margin-right: 12rpx;
 }
-.meta-cost {
+.walk-label {
+  font-size: 26rpx;
   color: var(--text-2);
-  margin-left: 20rpx;
+  margin-right: 8rpx;
 }
-
-/* 数据面板 */
-.stat-panel {
-  display: flex;
-  align-items: stretch;
-  background: #faf8f6;
-  border: 1rpx solid var(--line);
-  border-radius: 22rpx;
-  padding: 18rpx 12rpx;
-  margin-top: 18rpx;
-}
-.stat {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-.stat-divider {
-  width: 1rpx;
-  background: #ececec;
-  margin: 6rpx 0;
-}
-.stat-top {
-  display: flex;
-  align-items: center;
-  gap: 10rpx;
-}
-.stat-label {
-  font-size: 24rpx;
-  color: var(--text-2);
-}
-.stat-value {
-  display: flex;
-  align-items: baseline;
-  margin-top: 6rpx;
-}
-.stat-value .num {
-  font-size: 48rpx;
+.walk-num {
+  font-size: 60rpx;
   font-weight: 800;
   line-height: 1;
   color: var(--brand);
 }
-.stat-value .unit {
-  font-size: 26rpx;
+.walk-unit {
+  font-size: 28rpx;
   font-weight: 600;
   color: var(--brand);
   margin-left: 6rpx;
 }
-/* 距离一栏弱化为中性色，避免与主指标抢焦点 */
-.stat:last-child .stat-value .num,
-.stat:last-child .stat-value .unit {
-  color: var(--text-1);
+
+/* 直线距离（弱化） */
+.dist-mini {
+  font-size: 24rpx;
+  color: var(--text-3);
+  margin-top: 10rpx;
 }
 
 /* 步行·脚印图标 */
@@ -429,27 +408,35 @@
 .action-bar {
   display: flex;
   align-items: center;
-  gap: 22rpx;
-  margin-top: 20rpx;
+  justify-content: space-between;
+  margin-top: 24rpx;
 }
-.act {
-  flex: 1;
-  height: 88rpx;
-  line-height: 88rpx;
-  text-align: center;
+.change-btn {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+  height: 76rpx;
+  padding: 0 44rpx;
   border-radius: 999rpx;
-  font-size: 32rpx;
-  font-weight: 600;
-}
-.act-ghost {
   color: var(--brand);
   background: var(--brand-soft);
   border: 2rpx solid var(--brand-line);
+  font-size: 28rpx;
+  font-weight: 600;
 }
-.act-ghost[disabled] {
+.change-btn.is-disabled {
   color: var(--text-3);
   background: #f3f2f0;
   border-color: #ececec;
+  opacity: 0.75;
+}
+.change-icon {
+  width: 30rpx;
+  height: 30rpx;
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='%23ff6b35'%3E%3Cpath%20d='M17.65%206.35A7.958%207.958%200%200012%204a8%208%200%20108%208h-2a6%206%200%2011-6-6c1.66%200%203.14.69%204.22%201.78L13%2011h7V4l-2.35%202.35z'/%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
 }
 
 /* 导航图标按钮（FAB） */
