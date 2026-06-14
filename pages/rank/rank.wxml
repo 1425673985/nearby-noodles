@@ -21,7 +21,7 @@
       wx:for="{{list}}"
       wx:key="id"
       data-index="{{index}}"
-      bindtap="navItem"
+      bindtap="selectItem"
     >
       <view class="rk-no rk-no-{{index < 3 ? index + 1 : 'rest'}}">{{index + 1}}</view>
 
@@ -43,7 +43,7 @@
         <view class="rk-dist" wx:else>
           <text class="rk-dist-num">{{item.distance}}</text><text class="rk-dist-unit">m</text>
         </view>
-        <view class="rk-go">去这家</view>
+        <view class="rk-go">查看</view>
       </view>
     </view>
 

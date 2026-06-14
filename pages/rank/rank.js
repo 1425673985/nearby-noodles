@@ -21,14 +21,17 @@ Page({
     return ((app.globalData && app.globalData.nearbyList) || []).slice()
   },
 
-  // 距离榜：按距离升序
+  // 榜单只取前 10（以用户为中心：就近/高分前十）
+  TOP_N: 10,
+
+  // 距离榜：按距离升序，取前 10
   loadDistanceRank() {
-    const list = this.getNearby().sort((a, b) => a.distance - b.distance)
-    const hasRating = list.some((it) => it.ratingNum > 0)
-    this.setData({ list, activeTab: 'distance', hasRating, ratingEmpty: false })
+    const all = this.getNearby().sort((a, b) => a.distance - b.distance)
+    const hasRating = all.some((it) => it.ratingNum > 0)
+    this.setData({ list: all.slice(0, this.TOP_N), activeTab: 'distance', hasRating, ratingEmpty: false })
   },
 
-  // 好评榜：按评分降序（无评分的沉底）
+  // 好评榜：按评分降序（无评分的沉底），取前 10
   loadRatingRank() {
     const all = this.getNearby()
     const hasRating = all.some((it) => it.ratingNum > 0)
@@ -37,13 +40,13 @@ Page({
       this.setData({ list: [], activeTab: 'rating', hasRating, ratingEmpty: true })
       return
     }
-    const list = all.sort((a, b) => {
+    const sorted = all.sort((a, b) => {
       if (b.ratingNum !== a.ratingNum) {
         return b.ratingNum - a.ratingNum
       }
       return a.distance - b.distance
     })
-    this.setData({ list, activeTab: 'rating', hasRating, ratingEmpty: false })
+    this.setData({ list: sorted.slice(0, this.TOP_N), activeTab: 'rating', hasRating, ratingEmpty: false })
   },
 
   // 未开放的标签（热门）
@@ -54,20 +57,19 @@ Page({
     })
   },
 
-  // 点击某家：打开导航
-  navItem(e) {
+  // 点击某家：返回首页并在详情卡展示这家
+  selectItem(e) {
     const index = e.currentTarget.dataset.index
     const item = this.data.list[index]
-    if (!item || !item.location) {
+    if (!item) {
       return
     }
-    wx.openLocation({
-      latitude: item.location.lat,
-      longitude: item.location.lng,
-      name: item.name,
-      address: item.address,
-      scale: 18,
-      fail: () => {}
+    const app = getApp()
+    app.globalData.pendingShop = item
+    wx.navigateBack({
+      fail: () => {
+        wx.reLaunch({ url: '/pages/index/index' })
+      }
     })
   },
 

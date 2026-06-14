@@ -63,6 +63,37 @@ Page({
   onShow() {
     // 检查登录状态
     this.checkLogin()
+    // 从排行页选店返回时，展示选中的面馆
+    this.applyPendingShop()
+  },
+
+  // 应用从排行页选中的面馆
+  applyPendingShop() {
+    const app = getApp()
+    const shop = app.globalData && app.globalData.pendingShop
+    if (!shop) {
+      return
+    }
+    app.globalData.pendingShop = null
+
+    // 组装「换一家」候选：选中的 + 最近的另一家
+    const list = (app.globalData.nearbyList || [])
+    const others = list.filter((it) => this.shopKey(it) !== this.shopKey(shop))
+    const searched = others[0] ? [shop, others[0]] : [shop]
+
+    this.setData({
+      restaurant: shop,
+      searchedRestaurants: searched,
+      currentIndex: 0,
+      foodImgError: false,
+      liked: this.isLiked(shop),
+      loading: false,
+      error: null
+    })
+
+    setTimeout(() => {
+      this.focusOnUserAndRestaurant()
+    }, 300)
   },
 
   // 检查定位授权状态

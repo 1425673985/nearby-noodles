@@ -18,6 +18,7 @@ App({
     userInfo: null,
     location: null,
     userLocation: null, // 最近一次定位
-    nearbyList: [] // 附近面馆完整列表（按距离升序），供排行页使用
+    nearbyList: [], // 附近面馆完整列表（按距离升序），供排行页使用
+    pendingShop: null // 排行页选中、待首页展示的面馆
   }
 })
