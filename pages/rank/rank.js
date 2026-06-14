@@ -14,6 +14,18 @@ Page({
     this.setData({ ['imgErr.' + i]: true })
   },
 
+  // 点击缩略图：全屏预览（不触发整行的「查看」）
+  previewItemPhoto(e) {
+    const index = e.currentTarget.dataset.index
+    const item = this.data.list[index]
+    const url = item && item.foodImage
+    if (url && url.indexOf('http') === 0) {
+      wx.previewImage({ urls: [url], current: url })
+    } else {
+      wx.showToast({ title: '暂无实景图', icon: 'none' })
+    }
+  },
+
   onShow() {
     // 进入或切回时按当前榜单刷新
     if (this.data.activeTab === 'rating') {
