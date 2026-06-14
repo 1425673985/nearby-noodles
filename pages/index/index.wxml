@@ -1,24 +1,57 @@
 <!--index.wxml-->
-<view class="container">
-  <!-- 加载提示 -->
-  <view class="loading" wx:if="{{loading}}">
-    <text>正在加载附近面馆...</text>
+<view class="page">
+
+  <!-- ① 加载骨架屏 -->
+  <view class="skeleton" wx:if="{{loading}}">
+    <view class="sk-hero"></view>
+    <view class="sk-card">
+      <view class="sk-line sk-title"></view>
+      <view class="sk-tags">
+        <view class="sk-pill"></view>
+        <view class="sk-pill"></view>
+      </view>
+      <view class="sk-metric"></view>
+      <view class="sk-line sk-addr"></view>
+      <view class="sk-actions">
+        <view class="sk-btn"></view>
+        <view class="sk-btn"></view>
+      </view>
+    </view>
+    <view class="loading-tip">正在为你找面馆…</view>
   </view>
 
-  <!-- 授权提示 -->
-  <view class="auth-tip" wx:if="{{!hasLocationAuth}}">
-    <text>需要授权位置信息才能查找附近面馆</text>
-    <button bindtap="requestLocationAuth" type="primary">授权位置信息</button>
+  <!-- ② 定位授权引导 -->
+  <view class="state-screen" wx:elif="{{!hasLocationAuth}}">
+    <view class="state-art">
+      <view class="bowl">
+        <view class="bowl-steam"></view>
+        <view class="bowl-steam s2"></view>
+        <view class="bowl-steam s3"></view>
+      </view>
+    </view>
+    <view class="state-title">先开启定位吧</view>
+    <view class="state-desc">授权位置后，帮你找到走几步就能到的那碗面</view>
+    <button class="primary-btn tap-shrink" bindtap="requestLocationAuth">开启定位</button>
   </view>
 
-  <!-- 面馆信息卡片 -->
-  <view class="restaurant-card" wx:if="{{restaurant && hasLocationAuth && !loading}}">
-    <!-- 面馆地图 -->
-    <view class="restaurant-map-wrapper">
-      <map 
+  <!-- ③ 错误 / 空状态 -->
+  <view class="state-screen" wx:elif="{{error}}">
+    <view class="state-art">
+      <view class="bowl bowl-empty"></view>
+    </view>
+    <view class="state-title">没找到合适的面馆</view>
+    <view class="state-desc">{{error}}</view>
+    <button class="primary-btn tap-shrink" bindtap="retryLoad">重新找一找</button>
+  </view>
+
+  <!-- ④ 主内容 -->
+  <block wx:elif="{{restaurant}}">
+    <!-- 地图 Hero -->
+    <view class="hero">
+      <map
         id="restaurantMap"
-        class="restaurant-map" 
-        longitude="{{mapLongitude}}" 
+        class="hero-map"
+        longitude="{{mapLongitude}}"
         latitude="{{mapLatitude}}"
         scale="{{mapScale}}"
         markers="{{restaurant.mapMarkers}}"
@@ -34,57 +67,58 @@
         bindregionchange="onMapRegionChange"
         bindscalechange="onMapScaleChange"
       ></map>
-      <!-- 地图控制按钮（定位用户，默认隐藏） -->
-      <view class="map-control-buttons" wx:if="{{showLocationBtn}}">
-        <view class="map-control-btn location-user-btn" bindtap="moveToUserLocation">
-          <view class="location-pin-icon icon-blue"></view>
-        </view>
+
+      <!-- 顶部渐隐，提升状态栏区域可读性 -->
+      <view class="hero-topfade"></view>
+
+      <!-- 重新定位按钮（用户操作地图后出现） -->
+      <view class="recenter-btn tap-shrink {{showLocationBtn ? 'show' : ''}}" bindtap="moveToUserLocation">
+        <view class="recenter-icon"></view>
       </view>
     </view>
-    
-    <!-- 面馆信息 -->
-    <view class="restaurant-info">
-      <!-- 店名 -->
-      <view class="restaurant-name">{{restaurant.name}}</view>
-      
-      <!-- 推荐标签组 -->
-      <view class="restaurant-tags">
-        <!-- 原有状态卡 -->
-        <view class="tag-badge tag-primary">
-          <text class="tag-text">{{restaurant.tag}}</text>
-        </view>
-        <!-- 随机推荐状态卡 -->
-        <view class="tag-badge tag-random">
-          <text class="tag-text">{{restaurant.randomTag}}</text>
-        </view>
+
+    <!-- 信息卡（上提覆盖地图底缘） -->
+    <view class="card">
+      <view class="grip"></view>
+
+      <view class="name-row">
+        <text class="name">{{restaurant.name}}</text>
       </view>
 
-      <!-- 距离和步行时间 -->
-      <view class="restaurant-distance-info">
-        <!-- 距离信息（次要） -->
-        <view class="restaurant-distance">
-          距离 {{restaurant.distance}}m
-        </view>
-        <!-- 步行时间（高亮醒目） -->
-        <view class="restaurant-walking-time">
-          步行约 {{restaurant.walkingTime}} 分钟
-        </view>
+      <view class="tags">
+        <view class="tag tag-primary">{{restaurant.tag}}</view>
+        <view class="tag tag-random">{{restaurant.randomTag}}</view>
       </view>
 
-      <!-- 地址（弱化） -->
-      <view class="restaurant-address">{{restaurant.address}}</view>
+      <!-- 核心指标：步行时间 -->
+      <view class="metric">
+        <view class="metric-main">
+          <view class="walk-icon"></view>
+          <view class="metric-text">
+            <text class="metric-label">步行约</text>
+            <text class="metric-value">{{restaurant.walkingTime}}</text>
+            <text class="metric-unit">分钟</text>
+          </view>
+        </view>
+        <view class="metric-sub">{{restaurant.distance}}m</view>
+      </view>
+
+      <!-- 地址 -->
+      <view class="address">
+        <view class="pin-icon"></view>
+        <text class="address-text">{{restaurant.address}}</text>
+      </view>
     </view>
 
-        <!-- 操作按钮 -->
-        <view class="action-buttons">
-          <button class="action-btn change-btn" bindtap="changeRestaurant" disabled="{{searchedRestaurants.length <= 1}}">换一家</button>
-          <button class="action-btn nav-btn" bindtap="openNavigation">去这家</button>
-        </view>
-  </view>
+    <!-- 底部操作栏 -->
+    <view class="action-bar">
+      <button class="act act-ghost tap-shrink" bindtap="changeRestaurant" disabled="{{searchedRestaurants.length <= 1}}">
+        换一家
+      </button>
+      <button class="act act-primary tap-shrink" bindtap="openNavigation">
+        去这家
+      </button>
+    </view>
+  </block>
 
-  <!-- 错误提示 -->
-  <view class="error-tip" wx:if="{{error}}">
-    <text>{{error}}</text>
-    <button bindtap="retryLoad" type="primary">重试</button>
-  </view>
 </view>

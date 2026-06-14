@@ -130,6 +130,12 @@ Page({
 
   // 搜索附近面馆
   searchNearbyRestaurants(location) {
+    // 防止重复并发请求（连续点击/重试时只保留一次在途请求，避免浪费配额）
+    if (this._searching) {
+      return
+    }
+    this._searching = true
+
     this.setData({
       loading: true,
       error: null
@@ -145,19 +151,6 @@ Page({
       radius: config.SEARCH_RADIUS,
       success: (res) => {
         const restaurants = res.data || []
-        // 调试：打印返回的完整数据结构，查看是否有图片字段
-        if (restaurants.length > 0) {
-          console.log('========== 腾讯地图API返回的完整数据结构 ==========')
-          console.log('第一条数据：', JSON.stringify(restaurants[0], null, 2))
-          console.log('所有字段列表：', Object.keys(restaurants[0]))
-          console.log('是否有photo字段：', restaurants[0].photo)
-          console.log('是否有photos字段：', restaurants[0].photos)
-          console.log('是否有image_url字段：', restaurants[0].image_url)
-          console.log('是否有pic_url字段：', restaurants[0].pic_url)
-          console.log('是否有category字段：', restaurants[0].category)
-          console.log('是否有image字段：', restaurants[0].image)
-          console.log('==========================================')
-        }
         if (restaurants.length > 0) {
           // 限制最多只显示2家
           const displayRestaurants = restaurants.slice(0, 2)
@@ -191,10 +184,18 @@ Page({
       },
       fail: (err) => {
         console.error('搜索面馆失败', err)
+        // status 121：地图 Key 当日调用量已达上限
+        const quotaExceeded = err && (err.status === 121 || err.status === '121')
         this.setData({
           loading: false,
-          error: err.message || '搜索面馆失败，请稍后重试'
+          error: quotaExceeded
+            ? '今日地图服务额度已用完，请明天再试，或在控制台更换/升级地图 Key'
+            : (err && err.message) || '搜索面馆失败，请稍后重试'
         })
+      },
+      complete: () => {
+        // 无论成功失败，释放在途请求标记
+        this._searching = false
       }
     })
   },
@@ -286,9 +287,7 @@ Page({
   },
 
   // 地图点击事件
-  onMapTap(e) {
-    console.log('地图被点击', e)
-  },
+  onMapTap() {},
 
   // 地图拖动开始
   onMapRegionChange(e) {
@@ -417,9 +416,6 @@ Page({
           }
         ],
         padding: [60, 60, 60, 60], // 上下左右边距
-        success: () => {
-          console.log('地图自动聚焦成功')
-        },
         fail: (err) => {
           console.warn('地图自动聚焦失败，使用setData方式', err)
         }
@@ -561,9 +557,6 @@ Page({
       name: restaurant.name,
       address: restaurant.address,
       scale: 18,
-      success: () => {
-        console.log('打开导航成功')
-      },
       fail: (err) => {
         console.error('打开导航失败', err)
         wx.showToast({

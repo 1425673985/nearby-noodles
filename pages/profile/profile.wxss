@@ -1,38 +1,105 @@
-/* pages/profile/profile.wxss */
-.container {
-  width: 100%;
+/* pages/profile/profile.wxss · 暖食欲橙 */
+.page {
   min-height: 100vh;
-  background-color: #f5f5f5;
+  background: var(--bg);
   display: flex;
   flex-direction: column;
+  align-items: center;
+  padding: 0 40rpx;
+  box-sizing: border-box;
 }
 
-.profile-content {
-  flex: 1;
-  padding: 40rpx;
+/* 品牌头部 */
+.brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 100rpx 0 64rpx;
 }
-
-.info-section {
-  background-color: #ffffff;
-  border-radius: 20rpx;
-  padding: 40rpx;
+.brand-logo {
   margin-bottom: 40rpx;
 }
-
-.info-text {
-  font-size: 32rpx;
-  color: #333;
+.brand-name {
+  font-size: 44rpx;
+  font-weight: 800;
+  color: var(--text-1);
+  letter-spacing: 2rpx;
+}
+.brand-slogan {
+  font-size: 27rpx;
+  color: var(--text-2);
+  margin-top: 14rpx;
 }
 
-.version-container {
+/* 面碗插画（复用首页样式） */
+.bowl {
+  width: 168rpx;
+  height: 90rpx;
+  background: linear-gradient(180deg, #ff9d72, var(--brand));
+  border-radius: 14rpx 14rpx 86rpx 86rpx;
+  position: relative;
+  box-shadow: 0 18rpx 36rpx rgba(255, 107, 53, 0.28);
+}
+.bowl::before {
+  content: '';
+  position: absolute;
+  top: -12rpx;
+  left: -12rpx;
+  right: -12rpx;
+  height: 30rpx;
+  border-radius: 50%;
+  background: #ffd9c7;
+}
+.bowl-steam {
+  position: absolute;
+  top: -58rpx;
+  left: 48rpx;
+  width: 8rpx;
+  height: 42rpx;
+  border-radius: 8rpx;
+  background: rgba(255, 107, 53, 0.35);
+  animation: steam 2.4s ease-in-out infinite;
+}
+.bowl-steam.s2 { left: 80rpx; animation-delay: 0.5s; }
+.bowl-steam.s3 { left: 112rpx; animation-delay: 1s; }
+@keyframes steam {
+  0% { opacity: 0; transform: translateY(8rpx) scaleY(0.8); }
+  40% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-18rpx) scaleY(1.2); }
+}
+
+/* 信息卡 */
+.info-card {
   width: 100%;
-  padding: 40rpx 0;
-  text-align: center;
-  background-color: #f5f5f5;
+  background: var(--card);
+  border-radius: 28rpx;
+  box-shadow: var(--shadow-card);
+  padding: 8rpx 32rpx;
+}
+.info-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 104rpx;
+  border-bottom: 1rpx solid var(--line);
+}
+.info-row.no-line {
+  border-bottom: none;
+}
+.row-label {
+  font-size: 30rpx;
+  color: var(--text-1);
+}
+.row-value {
+  font-size: 28rpx;
+  color: var(--text-3);
 }
 
-.version-text {
+/* 页脚 */
+.footer {
+  margin-top: auto;
+  padding: 60rpx 0 calc(48rpx + env(safe-area-inset-bottom));
   font-size: 24rpx;
-  color: #999999;
+  color: var(--text-3);
+  letter-spacing: 2rpx;
 }
-

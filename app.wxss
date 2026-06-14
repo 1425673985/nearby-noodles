@@ -1,10 +1,48 @@
-/**app.wxss**/
-.container {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
-  padding: 200rpx 0;
-  box-sizing: border-box;
+/**app.wxss · 全局设计系统（暖食欲橙）**/
+
+page {
+  /* —— 色彩 —— */
+  --brand: #ff6b35;          /* 主品牌·食欲橙 */
+  --brand-deep: #f4511e;     /* 加深，用于渐变收尾 */
+  --brand-soft: #fff3ec;     /* 主色浅底 */
+  --brand-line: #ffd9c7;     /* 主色描边 */
+
+  --accent: #0ea5e9;         /* 辅助·定位蓝 */
+
+  --text-1: #1f1f22;         /* 主文字 */
+  --text-2: #6b6b70;         /* 次文字 */
+  --text-3: #a3a3a9;         /* 弱文字 */
+
+  --bg: #f6f5f3;             /* 暖灰页面底 */
+  --card: #ffffff;           /* 卡片 */
+  --line: #f0eeec;           /* 分隔线 */
+
+  /* —— 阴影 —— */
+  --shadow-card: 0 12rpx 40rpx rgba(31, 31, 34, 0.08);
+  --shadow-btn: 0 10rpx 24rpx rgba(255, 107, 53, 0.32);
+
+  background-color: var(--bg);
+  font-family: -apple-system, "PingFang SC", "Helvetica Neue", Helvetica, sans-serif;
+  color: var(--text-1);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 通用：去除默认按钮样式 */
+button {
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  line-height: normal;
+}
+button::after {
+  border: none;
+}
+
+/* 通用·按压反馈 */
+.tap-shrink {
+  transition: transform 0.12s ease, opacity 0.12s ease;
+}
+.tap-shrink:active {
+  transform: scale(0.97);
+  opacity: 0.92;
 }

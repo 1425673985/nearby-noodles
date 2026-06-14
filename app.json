@@ -4,8 +4,9 @@
     "pages/profile/profile"
   ],
   "window": {
-    "backgroundTextStyle": "light",
-    "navigationBarBackgroundColor": "#fff",
+    "backgroundTextStyle": "dark",
+    "backgroundColor": "#f6f5f3",
+    "navigationBarBackgroundColor": "#ffffff",
     "navigationBarTitleText": "附近面馆",
     "navigationBarTextStyle": "black"
   },
