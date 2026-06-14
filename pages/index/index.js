@@ -21,7 +21,8 @@ Page({
     mapScale: 16, // 地图缩放级别
     showLocationBtn: false, // 是否显示定位用户按钮
     mapContext: null, // 地图上下文
-    mapInteractionTimer: null // 地图交互定时器
+    mapInteractionTimer: null, // 地图交互定时器
+    foodImgError: false // 门脸图加载失败时回退到插画
   },
 
   onLoad() {
@@ -167,6 +168,7 @@ Page({
             searchedRestaurants: displayRestaurants,
             currentIndex: 0,
             restaurant: firstRestaurant,
+            foodImgError: false,
             loading: false,
             error: null
           })
@@ -272,6 +274,11 @@ Page({
     // 计算步行时间
     const walkingTime = this.calculateWalkingTime(Math.round(distance))
 
+    // 识别面食品类（用于食欲配图 + 品类标签）
+    const food = this.resolveFood(name, restaurant.category)
+    // 门脸图优先级：街景（可选开关）> 品类配图 > 兜底插画
+    const foodImage = this.buildHeroImage(food.img, lat, lng)
+
     return {
       id: restaurant.id || restaurant._id || '',
       name: name,
@@ -282,12 +289,70 @@ Page({
       mapMarkers: mapMarkers,
       tel: restaurant.tel || restaurant.phone || '',
       tag: tag,
-      randomTag: randomTag
+      randomTag: randomTag,
+      category: food.label,
+      foodImage: foodImage
     }
+  },
+
+  // 面食品类关键词表（命中越靠前优先级越高）
+  FOOD_KEYWORDS: [
+    { k: ['牛肉面', '牛肉'], label: '牛肉面', img: 'beef' },
+    { k: ['兰州', '拉面'], label: '兰州拉面', img: 'lanzhou' },
+    { k: ['重庆', '小面'], label: '重庆小面', img: 'xiaomian' },
+    { k: ['刀削'], label: '刀削面', img: 'daoxiao' },
+    { k: ['担担', '担坦'], label: '担担面', img: 'dandan' },
+    { k: ['热干'], label: '热干面', img: 'regan' },
+    { k: ['炸酱'], label: '炸酱面', img: 'zhajiang' },
+    { k: ['云吞', '馄饨', '抄手', '扁食'], label: '馄饨面', img: 'wonton' },
+    { k: ['螺蛳粉', '螺狮粉', '螺丝粉'], label: '螺蛳粉', img: 'luosifen' },
+    { k: ['米线', '米粉'], label: '米线', img: 'mixian' },
+    { k: ['荞面', '荞麦'], label: '荞面', img: 'qiaomian' },
+    { k: ['牛杂', '牛腩'], label: '牛杂面', img: 'beef' }
+  ],
+
+  // 根据店名/品类识别面食类型
+  resolveFood(name, category) {
+    const text = `${name || ''} ${category || ''}`
+    for (const item of this.FOOD_KEYWORDS) {
+      if (item.k.some((word) => text.indexOf(word) !== -1)) {
+        return { label: item.label, img: item.img }
+      }
+    }
+    return { label: '面馆', img: 'default' }
+  },
+
+  // 构建门脸图地址
+  buildHeroImage(imgKey, lat, lng) {
+    // 街景门脸（可选）：覆盖率有限且消耗地图配额，默认关闭，在 config.js 中开启
+    if (config.ENABLE_STREETVIEW && lat && lng) {
+      return `https://apis.map.qq.com/ws/streetview/v1/image?size=750*420&radius=150&location=${lat},${lng}&key=${config.TENCENT_MAP_KEY}`
+    }
+    // 品类配图（本地资源，需放入 images/food/ 目录；缺图时由插画兜底）
+    return `/images/food/${imgKey}.jpg`
   },
 
   // 地图点击事件
   onMapTap() {},
+
+  // 门脸图加载失败：回退到插画
+  onFoodImgError() {
+    this.setData({ foodImgError: true })
+  },
+
+  // 一键拨打面馆电话
+  callShop() {
+    const { restaurant } = this.data
+    if (!restaurant || !restaurant.tel) {
+      return
+    }
+    // 腾讯地图返回的 tel 可能含多个号码（以分号/逗号分隔），取第一个
+    const phoneNumber = String(restaurant.tel).split(/[;,，；]/)[0].trim()
+    wx.makePhoneCall({
+      phoneNumber,
+      fail: () => {}
+    })
+  },
 
   // 地图拖动开始
   onMapRegionChange(e) {
@@ -415,7 +480,7 @@ Page({
             latitude: restaurant.location.lat
           }
         ],
-        padding: [60, 60, 60, 60], // 上下左右边距
+        padding: [110, 60, 460, 60], // 上/右/下/左：底部留足空间，避免标记被悬浮底卡遮挡
         fail: (err) => {
           console.warn('地图自动聚焦失败，使用setData方式', err)
         }
@@ -529,9 +594,10 @@ Page({
 
     this.setData({
       currentIndex: nextIndex,
-      restaurant: nextRestaurant
+      restaurant: nextRestaurant,
+      foodImgError: false
     })
-    
+
     // 自动聚焦到新的面馆位置（用户位置+新面馆位置）
     setTimeout(() => {
       this.focusOnUserAndRestaurant()

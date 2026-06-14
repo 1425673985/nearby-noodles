@@ -12,5 +12,10 @@ module.exports = {
   SEARCH_RADIUS: 3000,
 
   // 搜索关键词
-  SEARCH_KEYWORD: '面馆'
+  SEARCH_KEYWORD: '面馆',
+
+  // 是否使用腾讯街景图作为门脸图（默认关闭）
+  // ⚠️ 注意：街景对店内小面馆覆盖率有限，且每次会消耗地图配额。
+  //   关闭时使用本地品类配图（images/food/*.jpg），缺图时由插画兜底，零配额消耗。
+  ENABLE_STREETVIEW: false
 }
